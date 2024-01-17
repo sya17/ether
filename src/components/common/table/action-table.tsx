@@ -4,25 +4,22 @@ import { Button } from "@/components/ui/button";
 import * as dialog from "@/components/ui/dialog";
 import * as dropdown from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { TableProps } from "@/interfaces/table";
-import {
-  addColumnTable,
-  addFilter,
-  removeFilter,
-} from "@/lib/redux/slices/tableSlice";
-import { useDispatch, useSelector } from "@/lib/redux/store";
-import { setTable } from "@/lib/table-util";
+import { mainComponents } from "@/constant/component-constant";
+import { DetailComponentProps } from "@/interfaces/detail-component";
+import { cn } from "@/lib/utils";
 import { Table } from "@tanstack/react-table";
-import { Filter, Plus, Settings2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Filter, Plus, Settings2, Trash } from "lucide-react";
+import { useState } from "react";
 
 export const ActionTable = async <T extends object>({
   dataTable,
+  detail,
 }: {
   dataTable: Table<T>;
+  detail: DetailComponentProps;
 }) => {
   const [listFilter, setListFilter] = useState<string>();
+  const ComponentDetail = mainComponents[detail.page];
 
   const doAddFilter = (column: string) => {
     setListFilter(column);
@@ -39,15 +36,18 @@ export const ActionTable = async <T extends object>({
   return (
     <div className="flex items-center py-4 space-x-2">
       <div className="flex flex-col w-full space-y-1">
-        <div className="inline-flex space-x-2">
+        <div className="inline-flex">
           <dropdown.DropdownMenu>
             <dropdown.DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex cursor-pointer px-2 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-background/90"
+              <button
+                // variant="outline"
+                className={cn(
+                  "flex justify-center items-center cursor-pointer  px-2 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-background/90",
+                  listFilter ? "rounded-l-md" : "rounded-md mr-2"
+                )}
               >
                 <Filter className="h-4 w-4" />
-              </Button>
+              </button>
             </dropdown.DropdownMenuTrigger>
             <dropdown.DropdownMenuContent align="end">
               {dataTable &&
@@ -74,54 +74,51 @@ export const ActionTable = async <T extends object>({
                   })}
             </dropdown.DropdownMenuContent>
           </dropdown.DropdownMenu>
-          <div className="flex items-center ">
-            {listFilter ? <span>{listFilter}</span> : <></>}
+          <div className="flex items-center justify-center mr-2">
+            {listFilter ? (
+              <span className="w-full h-full justify-center items-center text-center rounded-r-md px-2 py-1 bg-primary text-primary-foreground">
+                {listFilter}
+              </span>
+            ) : (
+              <></>
+            )}
           </div>
           <Input placeholder="search" className="max-w-sm" />
         </div>
       </div>
-      <div className=" w-full flex justify-end ml-auto float-right ">
+      <div className=" w-full flex justify-end ml-auto float-right space-x-2">
         <dialog.Dialog>
           <dialog.DialogTrigger asChild>
-            <Button className="inline-flex space-x-2 items-center bg-primary text-primary-foreground hover:bg-primary/90 hover:text-background/90">
-              <Plus className="w-4 h-4" />
-              <span>Add</span>
+            <Button className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative">
+              <Plus className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-14" />
+              <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100">
+                Add
+              </span>
             </Button>
           </dialog.DialogTrigger>
-          <dialog.DialogContent className="sm:max-w-[425px]">
+          <dialog.DialogContent
+            className="sm:max-w-1/2 flex flex-col space-y-4"
+            onInteractOutside={(e) => {
+              e.preventDefault();
+            }}
+          >
             <dialog.DialogHeader>
-              <dialog.DialogTitle>Edit profile</dialog.DialogTitle>
+              <dialog.DialogTitle>{detail.title}</dialog.DialogTitle>
               <dialog.DialogDescription>
-                Make changes to your profile here. Click save when you're done.
+                {detail.description}
               </dialog.DialogDescription>
             </dialog.DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input
-                  id="name"
-                  defaultValue="Pedro Duarte"
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  defaultValue="@peduarte"
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-            <dialog.DialogFooter>
-              <Button type="submit">Save changes</Button>
-            </dialog.DialogFooter>
+            {/* Detail Page */}
+            <ComponentDetail />
           </dialog.DialogContent>
         </dialog.Dialog>
+
+        <Button className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative">
+          <Trash className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-16" />
+          <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100">
+            Delete
+          </span>
+        </Button>
       </div>
       <dropdown.DropdownMenu>
         <dropdown.DropdownMenuTrigger asChild>

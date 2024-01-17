@@ -3,6 +3,7 @@ import { Button } from "../../ui/button";
 import { Column, ColumnDef, Row } from "@tanstack/react-table";
 
 interface ColumnHeader<T extends object> {
+  name: string;
   columns: Column<T>;
 }
 
@@ -13,13 +14,14 @@ interface ColumnCell<T extends object> {
 
 export const ColumnHeader = <T extends object>({
   columns,
+  name,
 }: ColumnHeader<T>) => {
   return (
     <Button
       variant="ghost"
       onClick={() => columns.toggleSorting(columns.getIsSorted() === "asc")}
     >
-      Name
+      {name}
       <ArrowUpDown className="ml-2 h-4 w-4" />
     </Button>
   );

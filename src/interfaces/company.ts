@@ -1,4 +1,5 @@
 export interface Company {
   id: number | undefined;
-  name: String;
+  name?: string;
+  publicKey?: string;
 }

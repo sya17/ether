@@ -76,6 +76,11 @@ export const apiCall = createAsyncThunk(
       Object.keys(config.queryParams || {}).forEach((key) => {
         url.searchParams.append(key, config.queryParams![key]);
       });
+      // Set the media type header
+      config.headers = {
+        ...config.headers,
+        "Content-Type": "application/json", // Change this based on your media type
+      };
 
       console.log("url ", url.toString());
       console.log("params ", url.searchParams);
