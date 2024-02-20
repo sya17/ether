@@ -2,10 +2,10 @@ import { SerializedError } from "@reduxjs/toolkit";
 
 export interface Api<T> {
   endpoint: string;
-  method: "GET" | "POST" | "PUT" | "DELETE";
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: Record<string, string>;
   body?: Record<string, any>;
-  pathParams?: Record<string, string>;
+  pathParams?: Record<string, any>;
   queryParams?: Record<string, any>;
 }
 

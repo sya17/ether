@@ -1,13 +1,6 @@
+import { combineReducersConstan } from "@/constant/module-slice-constant";
 import { combineReducers } from "redux";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
-
-// slices
-import mainSliceReducer from "./slices/mainSlice";
-import commonSliceReducer from "./slices/commonSlice";
-import tableSliceReducer from "./slices/tableSlice";
-import apiSliceReducer from "./slices/apiSlice";
-
-// ----------------------------------------------------------------------
 
 export const createNoopStorage = () => ({
   getItem(_key: string) {
@@ -40,11 +33,6 @@ export const productPersistConfig = {
   whitelist: ["sortBy", "checkout"],
 };
 
-const rootReducer = combineReducers({
-  cards: mainSliceReducer,
-  common: commonSliceReducer,
-  table: tableSliceReducer,
-  api: apiSliceReducer,
-});
+const rootReducer = combineReducers(combineReducersConstan);
 
 export default rootReducer;

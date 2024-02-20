@@ -4,16 +4,19 @@ export default function PagingTable({
   toPage,
   prevPage,
   nextPage,
+  pageNo,
+  pageRecords,
+  ttlPages,
+  ttlRecords,
 }: {
   nextPage: () => void;
   prevPage: () => void;
   toPage: (page: number) => void;
+  ttlRecords?: number;
+  ttlPages?: number;
+  pageNo?: number;
+  pageRecords?: number;
 }) {
-  const pageNo = useSelector((state) => state.api.response?.pageNo);
-  const pageRecords = useSelector((state) => state.api.response?.pageRecords);
-  const ttlPages = useSelector((state) => state.api.response?.ttlPages);
-  const ttlRecords = useSelector((state) => state.api.response?.ttlRecords);
-
   const renderPaginationLinks = () => {
     const totalPage: number[] = [];
 
@@ -92,11 +95,16 @@ export default function PagingTable({
   return (
     <page.Pagination className="justify-end">
       <page.PaginationContent>
-        <page.PaginationItem className="cursor-pointer">
+        <page.PaginationItem className="cursor-pointer" key={"prev-page"}>
           <page.PaginationPrevious onClick={prevPage} />
         </page.PaginationItem>
         {renderPaginationLinks()}
-        <page.PaginationItem className="cursor-pointer">
+        <page.PaginationItem
+          className={
+            ttlPages! == pageNo! + 1 ? "cursor-default" : "cursor-pointer"
+          }
+          key={"next-page"}
+        >
           <page.PaginationNext onClick={nextPage} />
         </page.PaginationItem>
       </page.PaginationContent>

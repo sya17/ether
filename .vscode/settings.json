@@ -1,5 +1,6 @@
 {
     "conventionalCommits.scopes": [
         "form layout main"
-    ]
+    ],
+    "vscord.enabled": false
 }

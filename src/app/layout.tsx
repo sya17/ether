@@ -5,27 +5,27 @@ import { Providers } from "@/app/provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Metadata } from "next";
 
-// export const metadata: Metadata = {
-//   title: "Ether",
-//   description: "Ether",
-//   generator: "Next.js",
-//   manifest: "/manifest.json",
-//   keywords: ["nextjs", "nextjs13", "next13", "pwa", "next-pwa"],
-//   themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#fff" }],
-//   authors: [
-//     { name: "Ether" },
-//     {
-//       name: "Ether",
-//       url: "https://www.linkedin.com/in/sariphidayatullah/",
-//     },
-//   ],
-//   viewport:
-//     "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
-//   icons: [
-//     { rel: "apple-touch-icon", url: "logo/logo.jpg" },
-//     { rel: "icon", url: "logo/logo.jpg" },
-//   ],
-// };
+export const metadata: Metadata = {
+  title: "Ether",
+  description: "Ether",
+  generator: "Next.js",
+  manifest: "/manifest.json",
+  keywords: ["nextjs", "nextjs13", "next13", "pwa", "next-pwa"],
+  // themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#fff" }],
+  authors: [
+    { name: "Ether" },
+    {
+      name: "Ether",
+      url: "https://www.linkedin.com/in/sariphidayatullah/",
+    },
+  ],
+  // viewport:
+  //   "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
+  icons: [
+    { rel: "apple-touch-icon", url: "logo/logo.jpg" },
+    { rel: "icon", url: "logo/logo.jpg" },
+  ],
+};
 
 const poppins = Poppins({
   subsets: ["latin"],

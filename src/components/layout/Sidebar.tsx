@@ -84,7 +84,7 @@ export default function Sideba({ className }: { className: string }) {
   return hide ? (
     <></>
   ) : (
-    <aside className={cn("w-1/4 bg-popover", className)}>
+    <aside className={cn("w-1/6 bg-popover", className)}>
       <div className="flex h-full w-full flex-col overflow-hidden text-popover-foreground">
         <div className="h-14 flex justify-center items-center p-2">
           Company Logo

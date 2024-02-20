@@ -1,30 +1,28 @@
-"use client";
-
-import { ColumnDef, Row } from "@tanstack/react-table";
-import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/lib/redux/store";
-import { Company } from "@/interfaces/company";
-import { ColumnCell, ColumnHeader } from "../../common/table/column-table";
-import { SelectAll, SelectCell } from "../../common/table/select-table";
+import React, { useEffect, useState } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import { Customer } from "@/interfaces/customer";
+import { SelectAll, SelectCell } from "@/components/common/table/select-table";
+import {
+  ColumnCell,
+  ColumnHeader,
+} from "@/components/common/table/column-table";
 import { ActionCell } from "@/components/common/table/action-cell-table";
 import {
-  getCompany,
-  deleteCompany,
-  postCompany,
-  patchCompany,
-} from "@/lib/redux/slices/companySlice";
+  deleteCustomer,
+  getCustomer,
+  patchCustomer,
+  postCustomer,
+} from "@/lib/redux/slices/customerSlice";
 import { MainTable } from "@/components/common/table/main-table";
-
-export default function CompanyPage(params: {}) {
-  let idTable = "company-table";
+export default function CustomerPage(params: {}) {
+  let idTable = "customer-table";
   let detailPageComponent = "detail_company_page";
   const dispatch = useDispatch();
 
-  // fatch
-  const data = useSelector((state) => state.apiCompany.response?.data);
+  const data = useSelector((state) => state.apiCustomer.response?.data);
   const loading = useSelector((state) => state.apiCompany.loading);
 
-  // paging
   const [currentPage, setCurrentPage] = useState(0);
   const pageNo = useSelector((state) => state.apiCompany.response?.pageNo);
   const pageRecords = useSelector(
@@ -45,25 +43,25 @@ export default function CompanyPage(params: {}) {
 
   // action data
   const fetchData = async (page: number) => {
-    await dispatch(getCompany({ page: page, size: 10 }));
+    await dispatch(getCustomer({ page: page, size: 10 }));
   };
-  async function doSave(values: Company) {
-    await dispatch(postCompany(values));
+  async function doSave(values: Customer) {
+    await dispatch(postCustomer(values));
     await fetchData(0);
   }
-  async function doUpdate(values: Company) {
+  async function doUpdate(values: Customer) {
     const { id } = values;
-    await dispatch(patchCompany({ id, values }));
+    await dispatch(patchCustomer({ id, values }));
     await fetchData(0);
   }
-  const doDeleteSelected = async (selected: Company[]) => {
+  const doDeleteSelected = async (selected: Customer[]) => {
     await selected.map((e) => {
-      dispatch(deleteCompany(e.id));
+      dispatch(deleteCustomer(e.id));
     });
     await fetchData(0);
   };
-  const doDeleteOne = async (e: Company) => {
-    dispatch(deleteCompany(e.id));
+  const doDeleteOne = async (e: Customer) => {
+    dispatch(deleteCustomer(e.id));
     await fetchData(0);
   };
 
@@ -83,7 +81,7 @@ export default function CompanyPage(params: {}) {
   };
 
   // Column definition
-  const columns: ColumnDef<Company>[] = [
+  const columns: ColumnDef<Customer>[] = [
     {
       id: "select",
       header: ({ table }) => <SelectAll table={table} />,
@@ -119,14 +117,14 @@ export default function CompanyPage(params: {}) {
       cell: ({ row }) => (
         <ActionCell
           row={row}
-          idTable={idTable}
+          idTable={"customer-page"}
           detail={{
             title: "Company",
             description: "",
-            page: detailPageComponent,
+            page: "detail-customer-page",
           }}
-          doUpdate={doUpdate}
-          doDeleted={doDeleteOne}
+          doUpdate={() => {}}
+          doDeleted={() => {}}
         />
       ),
     },
@@ -136,7 +134,7 @@ export default function CompanyPage(params: {}) {
     <MainTable
       id={idTable}
       detailPage={{
-        title: "Company",
+        title: "Customer",
         description: "",
         page: detailPageComponent,
       }}

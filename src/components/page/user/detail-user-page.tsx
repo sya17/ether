@@ -8,29 +8,23 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { getCompany, postCompany } from "@/lib/redux/slices/companySlice";
+import { getUser, postUser } from "@/lib/redux/slices/userSlice";
 import { useDispatch } from "@/lib/redux/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-export default function DetailCompanyPage() {
+export default function DetailUserPage() {
   const dispatch = useDispatch();
   const formSchema = z.object({
     name: z.string().min(1, {
       message: "Name must be field.",
     }),
-    publicKey: z.string().min(1, {
-      message: "Public Key must be field.",
+    username: z.string().min(1, {
+      message: "Username must be field.",
     }),
-    keyDevice: z.string().min(1, {
-      message: "Key Device must be field.",
-    }),
-    codeDevice: z.string().min(1, {
-      message: "Code Device must be field.",
-    }),
-    posCode: z.string().min(1, {
-      message: "Pos Device must be field.",
+    password: z.string().min(1, {
+      message: "Password must be field.",
     }),
   });
 
@@ -38,16 +32,14 @@ export default function DetailCompanyPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      publicKey: "",
-      keyDevice: "",
-      codeDevice: "",
-      posCode: "",
+      username: "",
+      password: "",
     },
   });
 
   async function doSave(values: z.infer<typeof formSchema>) {
-    await dispatch(postCompany(values));
-    await dispatch(getCompany({ page: 0, size: 10 }));
+    await dispatch(postUser(values));
+    await dispatch(getUser({ page: 0, size: 10 }));
   }
 
   return (
@@ -76,13 +68,13 @@ export default function DetailCompanyPage() {
           />
           <FormField
             control={form.control}
-            name="publicKey"
+            name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Public Key</FormLabel>
+                <FormLabel>Username</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Public Key"
+                    placeholder="Username"
                     {...field}
                     className="text-primary bg-input"
                   />
@@ -93,48 +85,15 @@ export default function DetailCompanyPage() {
           />
           <FormField
             control={form.control}
-            name="keyDevice"
+            name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Key Device</FormLabel>
+                <FormLabel>Password</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Key Device"
+                    placeholder="Password"
                     {...field}
-                    className="text-primary bg-input"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="codeDevice"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Code Device</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Code Device"
-                    {...field}
-                    className="text-primary bg-input"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="posCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Pos Code</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Pos Code"
-                    {...field}
+                    type="password"
                     className="text-primary bg-input"
                   />
                 </FormControl>

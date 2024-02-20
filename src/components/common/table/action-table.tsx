@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import * as dialog from "@/components/ui/dialog";
 import * as dropdown from "@/components/ui/dropdown-menu";
@@ -7,16 +5,18 @@ import { Input } from "@/components/ui/input";
 import { mainComponents } from "@/constant/component-constant";
 import { DetailComponentProps } from "@/interfaces/detail-component";
 import { cn } from "@/lib/utils";
-import { Table } from "@tanstack/react-table";
+import { Row, Table } from "@tanstack/react-table";
 import { Filter, Plus, Settings2, Trash } from "lucide-react";
 import { useState } from "react";
 
 export const ActionTable = async <T extends object>({
   dataTable,
   detail,
+  doDeleted,
 }: {
   dataTable: Table<T>;
   detail: DetailComponentProps;
+  doDeleted: (selected: T[]) => void;
 }) => {
   const [listFilter, setListFilter] = useState<string>();
   const ComponentDetail = mainComponents[detail.page];
@@ -31,6 +31,10 @@ export const ActionTable = async <T extends object>({
 
   const isChekedFilter = (column: string) => {
     return listFilter == column;
+  };
+
+  const deleted = () => {
+    doDeleted(dataTable.getSelectedRowModel().rows.map((e) => e.original));
   };
 
   return (
@@ -113,7 +117,10 @@ export const ActionTable = async <T extends object>({
           </dialog.DialogContent>
         </dialog.Dialog>
 
-        <Button className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative">
+        <Button
+          onClick={deleted}
+          className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative"
+        >
           <Trash className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-16" />
           <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100">
             Delete

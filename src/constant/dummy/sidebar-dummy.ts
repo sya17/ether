@@ -40,4 +40,14 @@ export const sidebarDummy: Sidebar[] = [
     label: "Company",
     icon: "layout-dashboard",
   },
+  {
+    id: "customer_page",
+    label: "Customer",
+    icon: "none",
+  },
+  {
+    id: "user_page",
+    label: "User",
+    icon: "none",
+  },
 ];
