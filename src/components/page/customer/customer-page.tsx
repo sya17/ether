@@ -91,12 +91,16 @@ export default function CustomerPage(params: {}) {
     },
     {
       accessorKey: "name",
-      header: ({ column }) => <ColumnHeader columns={column} name="Name" />,
+      header: ({ column }) => (
+        <ColumnHeader columns={column} name="Name" sorting={false} />
+      ),
       cell: ({ row }) => <ColumnCell row={row} name="name" />,
     },
     {
       accessorKey: "code",
-      header: ({ column }) => <ColumnHeader columns={column} name="Code" />,
+      header: ({ column }) => (
+        <ColumnHeader columns={column} name="Code" sorting={false} />
+      ),
       cell: ({ row }) => (
         <ColumnCell row={row} name="code" className="w-24 truncate " />
       ),
@@ -104,7 +108,7 @@ export default function CustomerPage(params: {}) {
     {
       accessorKey: "signature",
       header: ({ column }) => (
-        <ColumnHeader columns={column} name="Signature" />
+        <ColumnHeader columns={column} name="Signature" sorting={false} />
       ),
       cell: ({ row }) => (
         <ColumnCell row={row} name="signature" className="w-24 truncate" />
@@ -123,7 +127,7 @@ export default function CustomerPage(params: {}) {
             description: "",
             page: "detail-customer-page",
           }}
-          doUpdate={() => {}}
+          doDetail={() => {}}
           doDeleted={() => {}}
         />
       ),

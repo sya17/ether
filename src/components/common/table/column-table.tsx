@@ -12,6 +12,7 @@ import {
 interface ColumnHeader<T extends object> {
   name: string;
   columns: Column<T>;
+  sorting: boolean;
 }
 
 interface ColumnCell<T extends object> {
@@ -24,8 +25,9 @@ interface ColumnCell<T extends object> {
 export const ColumnHeader = <T extends object>({
   columns,
   name,
+  sorting,
 }: ColumnHeader<T>) => {
-  return (
+  return sorting ? (
     <Button
       variant="ghost"
       onClick={() => columns.toggleSorting(columns.getIsSorted() === "asc")}
@@ -33,6 +35,8 @@ export const ColumnHeader = <T extends object>({
       {name}
       <ArrowUpDown className="ml-2 h-4 w-4" />
     </Button>
+  ) : (
+    <span>{name}</span>
   );
 };
 

@@ -24,7 +24,7 @@ export default function dashboard(params: {}) {
         </cards.Card>
       </div>
       {/* section 2 */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2">
         <cards.Card className="w-full shadow-sm">
           <cards.CardHeader>
             <cards.CardTitle></cards.CardTitle>

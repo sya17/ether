@@ -85,7 +85,7 @@ export default function PagingTable({
       {!lastPage ? (
         <></>
       ) : (
-        <page.PaginationItem>
+        <page.PaginationItem key={pageNum - 1}>
           <page.PaginationEllipsis />
         </page.PaginationItem>
       )}

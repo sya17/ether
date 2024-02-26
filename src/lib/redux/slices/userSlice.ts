@@ -16,16 +16,38 @@ const createApiThunk = <T>(
 
 export const getUser = createApiThunk(
   "get/user",
-  ({ page, size }: { page: number; size: number }) =>
+  ({
+    page,
+    size,
+    sorting,
+    pathParams,
+    filters,
+  }: {
+    page: number;
+    size: number;
+    sorting: Record<string, string>;
+    pathParams?: Record<string, any>;
+    filters?: Record<string, any>;
+  }) =>
     apiUtil<User>({
       endpoint: "User",
       method: "GET",
-      queryParams: { page, size, desc: "createdDate" },
+      queryParams: { page, size, sorting, filters },
+      pathParams: pathParams,
+    })
+);
+export const getUserById = createApiThunk(
+  "get/user/id",
+  ({ id }: { id?: number }) =>
+    apiUtil<User>({
+      endpoint: "User/:id",
+      method: "GET",
+      pathParams: { id: id },
     })
 );
 export const postUser = createApiThunk("post/user", (value: User) =>
   apiUtil<User>({
-    endpoint: "User/register",
+    endpoint: "User",
     method: "POST",
     body: value,
   })
@@ -78,6 +100,7 @@ const userSlice = createSlice({
     };
 
     handleAsyncAction(getUser);
+    handleAsyncAction(getUserById);
     handleAsyncAction(postUser);
     handleAsyncAction(patchUser);
     handleAsyncAction(deleteUser);

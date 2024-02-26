@@ -1,7 +1,7 @@
 "use client";
 
-import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
+import Navbar from "@/layout/Navbar";
+import Sidebar from "@/layout/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import { setActivePage } from "@/lib/redux/slices/commonSlice";

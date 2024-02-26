@@ -6,9 +6,9 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useDispatch } from "react-redux";
 import { setActivePage } from "@/lib/redux/slices/commonSlice";
-import ProfileUser from "../custom/profile-user";
-import { Separator } from "../ui/separator";
 import { Sidebar } from "@/interfaces/sidebar";
+import { Separator } from "@/components/ui/separator";
+import ProfileUser from "@/components/custom/profile-user";
 
 export default function Sideba({ className }: { className: string }) {
   const hide = useSelector((state) => state.common.hideSidebar);
