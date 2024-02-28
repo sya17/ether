@@ -6,6 +6,7 @@ import { Company } from "@/interfaces/company";
 
 const initialState: ApiState<any> = {
   loading: false,
+  type: undefined,
   response: null,
 };
 

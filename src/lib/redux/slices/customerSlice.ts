@@ -6,6 +6,7 @@ import { Customer } from "@/interfaces/customer";
 
 const initialState: ApiState<any> = {
   loading: false,
+  type: undefined,
   response: null,
 };
 
