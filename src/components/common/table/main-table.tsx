@@ -4,7 +4,7 @@ import Loading from "@/app/loading";
 import { ActionTable } from "./action-table";
 import { DetailComponentProps } from "@/interfaces/detail-component";
 import PagingTable from "./paging-table";
-import { setTable } from "@/lib/table-util";
+import SetTable from "@/lib/table-util";
 
 export const MainTable = <T extends object>({
   id,
@@ -37,7 +37,7 @@ export const MainTable = <T extends object>({
     pageRecords: number;
   };
 }) => {
-  const dataTable = setTable({
+  const dataTable = SetTable({
     id: id,
     data: data,
     columns: columns,
