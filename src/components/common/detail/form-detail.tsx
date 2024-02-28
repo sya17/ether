@@ -1,39 +1,36 @@
+import { Button } from "@/components/ui/button";
 import * as dialog from "@/components/ui/dialog";
+import * as drawer from "@/components/ui/drawer";
 import { useState } from "react";
 
 export default function FormDetail({
   children,
   title,
   desc,
-  doOpenClosed,
-  openDialog,
+  open,
+  setOpen,
 }: {
-  openDialog: boolean;
-  doOpenClosed: React.Dispatch<
-    React.SetStateAction<{ open: boolean; data?: any }>
-  >;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   children: React.ReactNode;
   title: string;
   desc: string;
 }) {
+  const openClosed = (val: boolean) => {
+    setOpen(val);
+  };
   return (
-    <dialog.Dialog
-      modal={openDialog}
-      open={openDialog}
-      onOpenChange={(e) => doOpenClosed({ open: e, data: undefined })}
-    >
-      <dialog.DialogContent
-        className="sm:max-w-1/2 flex flex-col space-y-4"
-        onInteractOutside={(e) => {
-          e.preventDefault();
-        }}
+    <drawer.Drawer open={open} onOpenChange={openClosed} direction="right">
+      <drawer.DrawerContent
+        className="h-screen top-0 right-0 left-auto mt-0 w-[500px] rounded-l-md px-6 rounded-r-none"
+        onInteractOutside={() => openClosed(false)}
       >
-        <dialog.DialogHeader>
-          <dialog.DialogTitle>{title}</dialog.DialogTitle>
-          <dialog.DialogDescription> {desc}</dialog.DialogDescription>
-        </dialog.DialogHeader>
+        <drawer.DrawerHeader>
+          <drawer.DrawerTitle>{title}</drawer.DrawerTitle>
+          <drawer.DrawerDescription>{desc}</drawer.DrawerDescription>
+        </drawer.DrawerHeader>
         {children}
-      </dialog.DialogContent>
-    </dialog.Dialog>
+      </drawer.DrawerContent>
+    </drawer.Drawer>
   );
 }

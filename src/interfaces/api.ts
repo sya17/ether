@@ -23,7 +23,8 @@ export interface BaseResponse<T> {
 
 export interface ApiState<T> {
   loading: boolean;
-  response: BaseResponse<T> | null;
+  type: string | undefined | null;
+  response: BaseResponse<T> | undefined | null;
 }
 
 export interface RootState<T> {

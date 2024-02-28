@@ -50,4 +50,9 @@ export const sidebarDummy: Sidebar[] = [
     label: "User",
     icon: "none",
   },
+  {
+    id: "test_page",
+    label: "Test",
+    icon: "none",
+  },
 ];

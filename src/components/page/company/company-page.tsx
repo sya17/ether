@@ -36,35 +36,32 @@ export default function CompanyPage(params: {}) {
   );
 
   useEffect(() => {
-    fetchData(currentPage);
+    dispatch(getCompany({ page: currentPage, size: 10 }));
     // Cleanup effect
     return () => {
       // un-mount
     };
-  }, [currentPage]);
+  }, [dispatch, currentPage]);
 
   // action data
-  const fetchData = async (page: number) => {
-    await dispatch(getCompany({ page: page, size: 10 }));
-  };
   async function doSave(values: Company) {
     await dispatch(postCompany(values));
-    await fetchData(0);
+    await dispatch(getCompany({ page: currentPage, size: 10 }));
   }
   async function doUpdate(values: Company) {
     const { id } = values;
     await dispatch(patchCompany({ id, values }));
-    await fetchData(0);
+    await dispatch(getCompany({ page: currentPage, size: 10 }));
   }
   const doDeleteSelected = async (selected: Company[]) => {
     await selected.map((e) => {
       dispatch(deleteCompany(e.id));
     });
-    await fetchData(0);
+    await dispatch(getCompany({ page: currentPage, size: 10 }));
   };
   const doDeleteOne = async (e: Company) => {
     dispatch(deleteCompany(e.id));
-    await fetchData(0);
+    await dispatch(getCompany({ page: currentPage, size: 10 }));
   };
 
   // action page

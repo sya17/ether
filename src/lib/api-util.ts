@@ -12,11 +12,14 @@ export const apiUtil: <T extends object>(
 
     // Set path parameters
     Object.keys(config.pathParams || {}).forEach((key) => {
+      console.log("config.pathParams ", config.pathParams);
+
       url.pathname = url.pathname.replace(`:${key}`, config.pathParams![key]);
     });
 
     // Set query parameters
     Object.keys(config.queryParams || {}).forEach((key) => {
+      console.log("config.queryParams ", config.queryParams);
       url.searchParams.append(key, config.queryParams![key]);
     });
     // Set the media type header

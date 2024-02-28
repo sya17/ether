@@ -34,35 +34,32 @@ export default function CustomerPage(params: {}) {
   );
 
   useEffect(() => {
-    fetchData(currentPage);
+    dispatch(getCustomer({ page: currentPage, size: 10 }));
     // Cleanup effect
     return () => {
       // un-mount
     };
-  }, [currentPage]);
+  }, [dispatch, currentPage]);
 
   // action data
-  const fetchData = async (page: number) => {
-    await dispatch(getCustomer({ page: page, size: 10 }));
-  };
   async function doSave(values: Customer) {
     await dispatch(postCustomer(values));
-    await fetchData(0);
+    await dispatch(getCustomer({ page: currentPage, size: 10 }));
   }
   async function doUpdate(values: Customer) {
     const { id } = values;
     await dispatch(patchCustomer({ id, values }));
-    await fetchData(0);
+    await dispatch(getCustomer({ page: currentPage, size: 10 }));
   }
   const doDeleteSelected = async (selected: Customer[]) => {
     await selected.map((e) => {
       dispatch(deleteCustomer(e.id));
     });
-    await fetchData(0);
+    await dispatch(getCustomer({ page: currentPage, size: 10 }));
   };
   const doDeleteOne = async (e: Customer) => {
     dispatch(deleteCustomer(e.id));
-    await fetchData(0);
+    await dispatch(getCustomer({ page: currentPage, size: 10 }));
   };
 
   // action page

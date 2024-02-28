@@ -6,6 +6,7 @@ import { User } from "@/interfaces/user";
 
 const initialState: ApiState<any> = {
   loading: false,
+  type: undefined,
   response: null,
 };
 

@@ -11,11 +11,7 @@ import {
 } from "@tanstack/react-table";
 import React, { useState } from "react";
 
-export const setTable = <T extends object>({
-  id,
-  data,
-  columns,
-}: TableProps<T>) => {
+const SetTable = <T extends object>({ id, data, columns }: TableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -41,3 +37,5 @@ export const setTable = <T extends object>({
   });
   return table;
 };
+
+export default SetTable;

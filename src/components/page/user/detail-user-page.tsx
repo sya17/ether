@@ -1,3 +1,5 @@
+"use client";
+
 import FormDetail from "@/components/common/detail/form-detail";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,26 +12,33 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { User } from "@/interfaces/user";
-import { getUser, postUser } from "@/lib/redux/slices/userSlice";
+import {
+  getUser,
+  getUserById,
+  patchUser,
+  postUser,
+} from "@/lib/redux/slices/userSlice";
 import { useDispatch } from "@/lib/redux/store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogClose } from "@radix-ui/react-dialog";
-import { useEffect, useState } from "react";
+import { SaveIcon, Undo2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-export default function DetailUserPage({
-  detail,
-  doOpenClosed,
+const DetailUserPage = ({
+  openDetail,
+  setOpenDetail,
+  dataDetail,
 }: {
-  detail: { open: boolean; data?: User };
-  doOpenClosed: React.Dispatch<
-    React.SetStateAction<{ open: boolean; data?: User }>
-  >;
-}) {
+  openDetail: boolean;
+  setOpenDetail: React.Dispatch<React.SetStateAction<boolean>>;
+  dataDetail: User;
+}) => {
   const dispatch = useDispatch();
+  const [isEdit, setIsEdit] = useState(false);
 
   const formSchema = z.object({
+    id: z.number(),
     name: z.string().min(1, {
       message: "Name must be field.",
     }),
@@ -43,31 +52,50 @@ export default function DetailUserPage({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: detail.data ? detail.data.name : "",
-      username: "",
-      password: "",
-    },
   });
 
-  async function doSave(values: z.infer<typeof formSchema>) {
-    await dispatch(postUser(values));
+  async function onSave(values: z.infer<typeof formSchema>) {
+    if (isEdit) {
+      values.id = dataDetail.id!;
+      await dispatch(
+        patchUser({
+          id: dataDetail.id,
+          value: values,
+        })
+      );
+    } else {
+      await dispatch(postUser(values));
+    }
     await dispatch(getUser({ page: 0, size: 10 }));
+    setOpenDetail(false);
+    form.reset();
   }
+
+  useEffect(() => {
+    form.reset();
+    if (dataDetail) {
+      console.log("dataDetail.id ", dataDetail.id);
+
+      dispatch(getUserById(dataDetail.id));
+
+      form.setValue("name", dataDetail.name);
+      form.setValue("username", dataDetail.username);
+    }
+    setIsEdit(
+      dataDetail && dataDetail.id != undefined && dataDetail.id != null
+    );
+  }, [form, dispatch, dataDetail]);
 
   return (
     <FormDetail
-      openDialog={detail.open}
-      doOpenClosed={doOpenClosed}
+      open={openDetail}
+      setOpen={setOpenDetail}
       title="User"
       desc="Masterdata of User"
     >
       <div className="flex flex-col space-y-4 w-full h-full">
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(doSave)}
-            className="flex flex-col space-y-4"
-          >
+          <form className="flex flex-col space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -112,7 +140,6 @@ export default function DetailUserPage({
                     <Input
                       placeholder="Password"
                       {...field}
-                      type="password"
                       className="text-primary bg-input"
                     />
                   </FormControl>
@@ -120,14 +147,37 @@ export default function DetailUserPage({
                 </FormItem>
               )}
             />
-            <div className="inline-flex justify-end">
-              <DialogClose asChild>
-                <Button type="submit">Save</Button>
-              </DialogClose>
-            </div>
           </form>
         </Form>
+        <div className="flex space-x-2 justify-center">
+          {/* <Button
+            onClick={() => doOpenClosed({ open: false, data: undefined })}
+          >
+            Cancel
+          </Button>
+          <Button onClick={form.handleSubmit(doSave)}>Save</Button> */}
+
+          <Button
+            className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative"
+            onClick={() => setOpenDetail(!openDetail)}
+          >
+            <Undo2 className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-14" />
+            <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100 mx-auto left-8">
+              Cancel
+            </span>
+          </Button>
+          <Button
+            className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative"
+            onClick={form.handleSubmit(onSave)}
+          >
+            <SaveIcon className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-14" />
+            <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100 mx-auto left-8">
+              Save
+            </span>
+          </Button>
+        </div>
       </div>
     </FormDetail>
   );
-}
+};
+export default DetailUserPage;

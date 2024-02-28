@@ -18,7 +18,7 @@ export default function Loading() {
     //   <div className="spinner-blade"></div>
     //   <div className="spinner-blade"></div>
     // </div>
-    <div className="w-full h-full flex items-center justify-center">
+    <div className="w-full min-h-[50vh] h-full flex items-center justify-center">
       <div className="loader"></div>
     </div>
   );

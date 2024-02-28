@@ -2,12 +2,15 @@ import * as icons from "lucide-react";
 import * as Dropdown from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 export default function ProfileUser(params: {
   id: string;
   name: string;
   company?: string;
   className?: string;
 }) {
+  const router = useRouter();
+
   function initialName(val: string): string {
     if (val.length === 0) {
       throw new Error("Nama tidak boleh kosong");
@@ -16,6 +19,11 @@ export default function ProfileUser(params: {
     const inisial = stringName.map((e) => e[0]).join("");
     return inisial;
   }
+
+  const doLogout = () => {
+    router.push("/login");
+  };
+
   return (
     <div className={cn(params.className)}>
       <Dropdown.DropdownMenu>
@@ -102,10 +110,13 @@ export default function ProfileUser(params: {
             <span>API</span>
           </Dropdown.DropdownMenuItem>
           <Dropdown.DropdownMenuSeparator />
-          <Dropdown.DropdownMenuItem>
+          <Dropdown.DropdownMenuItem
+            onClick={doLogout}
+            className="cursor-pointer"
+          >
             <icons.LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
-            <Dropdown.DropdownMenuShortcut>⇧⌘Q</Dropdown.DropdownMenuShortcut>
+            {/* <Dropdown.DropdownMenuShortcut>⇧⌘Q</Dropdown.DropdownMenuShortcut> */}
           </Dropdown.DropdownMenuItem>
         </Dropdown.DropdownMenuContent>
       </Dropdown.DropdownMenu>

@@ -13,4 +13,5 @@ export const mainComponents: any = {
   detail_user_page: dynamic(
     () => import("@/components/page/user/detail-user-page")
   ),
+  test_page: dynamic(() => import("@/components/page/test-page")),
 };

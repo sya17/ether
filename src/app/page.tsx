@@ -23,7 +23,7 @@ export default function Home() {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [dispatch]);
 
   const ActivePage = useSelector((state) => {
     return state.common.page;
