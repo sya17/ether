@@ -1,11 +1,8 @@
 "use client";
 import { hideSidebar } from "@/lib/redux/slices/commonSlice";
 import { useDispatch, useSelector } from "@/lib/redux/store";
-import { PanelLeftClose, PanelRightClose, Search } from "lucide-react";
-import ProfileUser from "@/components/custom/profile-user";
-import { useTheme } from "next-themes";
+import { PanelLeftClose, PanelRightClose } from "lucide-react";
 import SelectTheme from "@/components/custom/select-theme";
-import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
 
 export default function Navbar({ className }: { className: string }) {
