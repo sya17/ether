@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { ColumnDef, Table } from "@tanstack/react-table";
 import { useDispatch, useSelector } from "@/lib/redux/store";
-import { getUser } from "@/lib/redux/slices/userSlice";
+// import { getUser } from "@/lib/redux/slices/userSlice";
 import { User } from "@/interfaces/user";
 import { SelectAll, SelectCell } from "@/components/common/table/select-table";
 import {
@@ -21,53 +21,61 @@ import SearchTable from "@/components/common/table/search-table";
 import DetailUserPage from "./detail-user-page";
 // import { SetTable } from "@/lib/table-util";
 import SetTable from "@/lib/table-util";
+import { apiUtil } from "@/lib/api-util";
+import {
+  getUser,
+  // fetchResource,
+  selectResourceData,
+  selectResourceError,
+  selectResourceLoading,
+  selectResourcePage,
+} from "@/lib/redux/slices/userSliceNew";
 
 const idTable = "user-table";
 const detailPageComponent = "detail_user_page";
 
 // page
-export default function UserPage() {
+const UserPage: React.FC = () => {
   const dispatch = useDispatch();
-  const [dataDetail, setDataDetail] = useState<User | undefined>();
+  const [key, setKey] = useState<number>();
+  const [openDetail, setOpenDetail] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [dataTable, setDataTable] = useState<Table<User>>();
-  const [openDetail, setOpenDetail] = useState<boolean>(false);
 
   // fatch
-  const data: User[] = useSelector((state) => state.apiUser.response?.data);
-  const error = useSelector((state) => state.apiUser.response?.error);
-  const loading = useSelector((state) => state.apiUser.loading);
-  // paging
-  const pageNo = useSelector((state) => state.apiUser.response?.pageNo);
-  const pageRecords = useSelector(
-    (state) => state.apiUser.response?.pageRecords
-  );
-  const ttlPages = useSelector((state) => state.apiUser.response?.ttlPages);
-  const ttlRecords = useSelector((state) => state.apiUser.response?.ttlRecords);
+  const dataList: User[] = useSelector(selectResourceData);
+  const page = useSelector(selectResourcePage);
+  const loading = useSelector(selectResourceLoading);
+  const error = useSelector(selectResourceError);
 
   //search function
-  const doSearch = (key: string, search: string) => {
+  const doSearch = (key: string | undefined, search: string | undefined) => {
     console.log("key", key);
     console.log("search", search);
 
-    dispatch(
-      getUser({
-        page: currentPage,
-        size: PAGINATION.limit,
-        sorting: { desc: "createdDate" },
-      })
-    );
+    // dispatch(
+    //   getUser({
+    //     page: currentPage,
+    //     size: PAGINATION.limit,
+    //     sorting: { desc: "createdDate" },
+    //   })
+    // );
   };
 
-  //search detail function
-  const doDetail = (val: User) => {
-    setOpenDetail(true);
-    setDataDetail(val);
+  //do detail function
+  const doDetail = (val: User | undefined) => {
+    openCloseDetail(true);
+    setKey(val?.id);
+  };
+
+  //action open close detail
+  const openCloseDetail = (val: boolean) => {
+    setOpenDetail(val);
   };
 
   // action page
   const handleNextPage = () => {
-    if (currentPage < ttlPages! - 1) {
+    if (currentPage < page.ttlPages! - 1) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -125,18 +133,30 @@ export default function UserPage() {
 
   const reactTable = SetTable({
     id: idTable,
-    data: data,
+    data: dataList,
     columns: columns,
   });
 
-  useEffect(() => {
+  const fatchData = (currentPage: number) => {
     dispatch(getUser({ page: currentPage, size: PAGINATION.limit }));
-    setDataTable(reactTable);
-    setOpenDetail(false);
-    setDataDetail(undefined);
-  }, [currentPage, dispatch, reactTable]);
+  };
 
-  if (!dataTable || loading || error) {
+  useEffect(() => {
+    // fatchData(currentPage);
+    dispatch(getUser({ page: currentPage, size: PAGINATION.limit }));
+  }, [currentPage, reactTable]);
+
+  useEffect(() => {
+    if (reactTable) {
+      setDataTable(reactTable);
+    }
+  }, [reactTable]);
+
+  useEffect(() => {
+    openCloseDetail(openDetail);
+  }, [openDetail]);
+
+  if (loading || error) {
     return <Loading />;
   }
 
@@ -147,9 +167,8 @@ export default function UserPage() {
         <div className="flex items-center py-4">
           <SearchTable dataTable={dataTable} doSearch={doSearch} />
           <div className=" w-full flex justify-end ml-auto float-right space-x-2 px-2">
-            <ButtonAdd doDetail={doDetail} />
+            <ButtonAdd openCloseDetail={openCloseDetail} />
             <ButtonDelete />
-            {/* <ButtonUploadExcel /> */}
           </div>
           <FilterTable dataTable={dataTable} />
         </div>
@@ -162,19 +181,21 @@ export default function UserPage() {
           prevPage={handlePrevPage}
           toPage={toPage}
           page={{
-            pageNo: pageNo!,
-            pageRecords: pageRecords!,
-            ttlPages: ttlPages!,
-            ttlRecords: ttlRecords!,
+            pageNo: page.pageNo!,
+            pageRecords: page.pageRecords!,
+            ttlPages: page.ttlPages!,
+            ttlRecords: page.ttlRecords!,
           }}
         />
       </div>
       {/* detail page */}
       <DetailUserPage
         openDetail={openDetail}
-        setOpenDetail={setOpenDetail}
-        dataDetail={dataDetail!}
+        openCloseDetail={openCloseDetail}
+        dataKey={{ id: key }}
       />
     </div>
   );
-}
+};
+
+export default UserPage;

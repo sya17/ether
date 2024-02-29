@@ -9,7 +9,7 @@ const SearchTable = ({
   dataTable,
   doSearch,
 }: {
-  dataTable: Table<any>;
+  dataTable: Table<any> | null | undefined;
   doSearch: (key: string, search: string) => void;
 }) => {
   const [listFilter, setListFilter] = useState<string>();

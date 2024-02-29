@@ -13,83 +13,122 @@ import {
 import { Input } from "@/components/ui/input";
 import { User } from "@/interfaces/user";
 import {
-  getUser,
-  getUserById,
+  getUserByKey,
   patchUser,
   postUser,
-} from "@/lib/redux/slices/userSlice";
-import { useDispatch } from "@/lib/redux/store";
+  selectResourceError,
+  selectResourceLoading,
+  selectSelectedResource,
+} from "@/lib/redux/slices/userSliceNew";
+// import { getUserById, patchUser, postUser } from "@/lib/redux/slices/userSlice";
+import { useDispatch, useSelector } from "@/lib/redux/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SaveIcon, Undo2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-const DetailUserPage = ({
-  openDetail,
-  setOpenDetail,
-  dataDetail,
-}: {
+interface UserDetailProps {
   openDetail: boolean;
-  setOpenDetail: React.Dispatch<React.SetStateAction<boolean>>;
-  dataDetail: User;
+  openCloseDetail: (val: boolean) => void;
+  dataKey: {
+    id?: number;
+  };
+}
+
+const DetailUserPage: React.FC<UserDetailProps> = ({
+  openDetail,
+  openCloseDetail,
+  dataKey,
 }) => {
   const dispatch = useDispatch();
-  const [isEdit, setIsEdit] = useState(false);
+  // fatch
+  const data: User | null = useSelector(selectSelectedResource);
 
   const formSchema = z.object({
-    id: z.number(),
-    name: z.string().min(1, {
-      message: "Name must be field.",
-    }),
-    username: z.string().min(1, {
-      message: "Username must be field.",
-    }),
-    password: z.string().min(1, {
-      message: "Password must be field.",
-    }),
+    name: z
+      .string()
+      .min(5, {
+        message: "Min 5 Character",
+      })
+      .nonempty("Name must be field."),
+    username: z
+      .string()
+      .min(5, {
+        message: "Min 5 Character",
+      })
+      .nonempty("Username must be field."),
+    password: z
+      .string()
+      .min(5, {
+        message: "Min 5 Character",
+      })
+      .nonempty("Password must be field."),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  async function onSave(values: z.infer<typeof formSchema>) {
-    if (isEdit) {
-      values.id = dataDetail.id!;
-      await dispatch(
+  const doClose = () => {
+    openCloseDetail(false);
+  };
+
+  const onSave = async (values: z.infer<typeof formSchema>) => {
+    console.log("Start Save");
+
+    if (dataKey && dataKey.id) {
+      // values.id = key.id!;
+      const dataUpdate: User = {
+        id: dataKey.id,
+        name: values.name,
+        username: values.username,
+        password: values.password,
+      };
+
+      dispatch(
         patchUser({
-          id: dataDetail.id,
-          value: values,
+          key: dataKey.id,
+          values: dataUpdate,
         })
       );
     } else {
-      await dispatch(postUser(values));
+      const saveData: User = {
+        id: undefined,
+        name: values.name,
+        username: values.username,
+        password: values.password,
+      };
+      dispatch(postUser(saveData));
     }
-    await dispatch(getUser({ page: 0, size: 10 }));
-    setOpenDetail(false);
-    form.reset();
-  }
+    doClose();
+  };
 
   useEffect(() => {
-    form.reset();
-    if (dataDetail) {
-      console.log("dataDetail.id ", dataDetail.id);
-
-      dispatch(getUserById(dataDetail.id));
-
-      form.setValue("name", dataDetail.name);
-      form.setValue("username", dataDetail.username);
+    if (dataKey && dataKey.id) {
+      dispatch(getUserByKey(dataKey.id));
     }
-    setIsEdit(
-      dataDetail && dataDetail.id != undefined && dataDetail.id != null
-    );
-  }, [form, dispatch, dataDetail]);
+  }, [dataKey.id]);
+
+  useEffect(() => {
+    console.log("data ", data);
+
+    if (data) {
+      form.setValue("name", data.name);
+      form.setValue("username", data.username);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    console.log("openDetail ", openDetail);
+
+    form.reset();
+  }, [openDetail]);
 
   return (
     <FormDetail
-      open={openDetail}
-      setOpen={setOpenDetail}
+      openDetail={openDetail}
+      openCloseDetail={openCloseDetail}
       title="User"
       desc="Masterdata of User"
     >
@@ -150,16 +189,9 @@ const DetailUserPage = ({
           </form>
         </Form>
         <div className="flex space-x-2 justify-center">
-          {/* <Button
-            onClick={() => doOpenClosed({ open: false, data: undefined })}
-          >
-            Cancel
-          </Button>
-          <Button onClick={form.handleSubmit(doSave)}>Save</Button> */}
-
           <Button
             className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative"
-            onClick={() => setOpenDetail(!openDetail)}
+            onClick={doClose}
           >
             <Undo2 className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-14" />
             <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100 mx-auto left-8">

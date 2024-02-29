@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { Action, ThunkAction, configureStore } from "@reduxjs/toolkit";
 import {
   TypedUseSelectorHook,
   useDispatch as useAppDispatch,
@@ -36,5 +36,11 @@ const useSelector: TypedUseSelectorHook<RootState> = useAppSelector;
 // Create a custom useDispatch hook with typed dispatch
 const useDispatch = () => useAppDispatch<AppDispatch>();
 
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
 // Export the Redux store, persistor, dispatch, useSelector, and useDispatch for use in components
 export { store, persistor, dispatch, useSelector, useDispatch };

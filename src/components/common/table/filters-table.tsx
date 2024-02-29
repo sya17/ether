@@ -3,7 +3,11 @@ import * as dropdown from "@/components/ui/dropdown-menu";
 import { Table } from "@tanstack/react-table";
 import { Settings2 } from "lucide-react";
 
-export default function FilterTable({ dataTable }: { dataTable: Table<any> }) {
+export default function FilterTable({
+  dataTable,
+}: {
+  dataTable: Table<any> | null | undefined;
+}) {
   return (
     <dropdown.DropdownMenu>
       <dropdown.DropdownMenuTrigger asChild>

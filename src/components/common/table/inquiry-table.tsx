@@ -9,7 +9,7 @@ export default function InquiryTable({
   toPage,
   page,
 }: {
-  dataTable: Table<any>;
+  dataTable: Table<any> | null | undefined;
   columns: ColumnDef<any>[];
   nextPage: () => void;
   prevPage: () => void;

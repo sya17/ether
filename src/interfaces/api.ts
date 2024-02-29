@@ -1,3 +1,4 @@
+import { API_TYPE } from "@/constant/common-constant";
 import { SerializedError } from "@reduxjs/toolkit";
 
 export interface Api<T> {
@@ -23,10 +24,25 @@ export interface BaseResponse<T> {
 
 export interface ApiState<T> {
   loading: boolean;
-  type: string | undefined | null;
+  type: string | undefined;
   response: BaseResponse<T> | undefined | null;
 }
 
 export interface RootState<T> {
   api: ApiState<T>;
+}
+
+export interface pagination<T> {
+  ttlRecords?: number;
+  ttlPages?: number;
+  pageNo?: number;
+  pageRecords?: number;
+}
+
+export interface ResourceState<T> {
+  dataList: T[];
+  page: pagination<T>;
+  selectedResource: T | null;
+  loading: boolean;
+  error: any;
 }

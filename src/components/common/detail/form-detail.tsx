@@ -7,20 +7,24 @@ export default function FormDetail({
   children,
   title,
   desc,
-  open,
-  setOpen,
+  openDetail,
+  openCloseDetail,
 }: {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  openDetail: boolean;
+  openCloseDetail: (val: boolean) => void;
   children: React.ReactNode;
   title: string;
   desc: string;
 }) {
   const openClosed = (val: boolean) => {
-    setOpen(val);
+    openCloseDetail(val);
   };
   return (
-    <drawer.Drawer open={open} onOpenChange={openClosed} direction="right">
+    <drawer.Drawer
+      open={openDetail}
+      onOpenChange={openClosed}
+      direction="right"
+    >
       <drawer.DrawerContent
         className="h-screen top-0 right-0 left-auto mt-0 w-[500px] rounded-l-md px-6 rounded-r-none"
         onInteractOutside={() => openClosed(false)}
