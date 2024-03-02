@@ -20,7 +20,6 @@ import {
   selectResourceLoading,
   selectSelectedResource,
 } from "@/lib/redux/slices/userSliceNew";
-// import { getUserById, patchUser, postUser } from "@/lib/redux/slices/userSlice";
 import { useDispatch, useSelector } from "@/lib/redux/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SaveIcon, Undo2 } from "lucide-react";

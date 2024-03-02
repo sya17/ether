@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { ColumnDef, Table } from "@tanstack/react-table";
 import { useDispatch, useSelector } from "@/lib/redux/store";
-// import { getUser } from "@/lib/redux/slices/userSlice";
 import { User } from "@/interfaces/user";
 import { SelectAll, SelectCell } from "@/components/common/table/select-table";
 import {
@@ -11,7 +10,7 @@ import {
   ColumnHeader,
 } from "@/components/common/table/column-table";
 import Loading from "@/app/loading";
-import { PAGINATION } from "@/constant/common-constant";
+import { CONNECTOR, OPERATORS, PAGINATION } from "@/constant/common-constant";
 import { ActionCell } from "@/components/common/table/action-cell-table";
 import ButtonAdd from "@/components/common/table/button-add";
 import ButtonDelete from "@/components/common/table/Button-delete";
@@ -19,17 +18,16 @@ import FilterTable from "@/components/common/table/filters-table";
 import InquiryTable from "@/components/common/table/inquiry-table";
 import SearchTable from "@/components/common/table/search-table";
 import DetailUserPage from "./detail-user-page";
-// import { SetTable } from "@/lib/table-util";
 import SetTable from "@/lib/table-util";
 import { apiUtil } from "@/lib/api-util";
 import {
   getUser,
-  // fetchResource,
   selectResourceData,
   selectResourceError,
   selectResourceLoading,
   selectResourcePage,
 } from "@/lib/redux/slices/userSliceNew";
+import { FilterRequest } from "@/interfaces/request-interface";
 
 const idTable = "user-table";
 const detailPageComponent = "detail_user_page";
@@ -41,6 +39,7 @@ const UserPage: React.FC = () => {
   const [openDetail, setOpenDetail] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [dataTable, setDataTable] = useState<Table<User>>();
+  const [search, setSearch] = useState<{ key: string; value: any }>();
 
   // fatch
   const dataList: User[] = useSelector(selectResourceData);
@@ -49,17 +48,8 @@ const UserPage: React.FC = () => {
   const error = useSelector(selectResourceError);
 
   //search function
-  const doSearch = (key: string | undefined, search: string | undefined) => {
-    console.log("key", key);
-    console.log("search", search);
-
-    // dispatch(
-    //   getUser({
-    //     page: currentPage,
-    //     size: PAGINATION.limit,
-    //     sorting: { desc: "createdDate" },
-    //   })
-    // );
+  const doSearch = (key: string | undefined, value: string | undefined) => {
+    setSearch({ key: key!, value: value });
   };
 
   //do detail function
@@ -137,26 +127,37 @@ const UserPage: React.FC = () => {
     columns: columns,
   });
 
-  const fatchData = (currentPage: number) => {
+  useEffect(() => {
     dispatch(getUser({ page: currentPage, size: PAGINATION.limit }));
-  };
+  }, [currentPage]);
 
   useEffect(() => {
-    // fatchData(currentPage);
-    dispatch(getUser({ page: currentPage, size: PAGINATION.limit }));
-  }, [currentPage, reactTable]);
+    console.log("dataList ", dataList);
 
-  useEffect(() => {
-    if (reactTable) {
-      setDataTable(reactTable);
-    }
+    if (reactTable) setDataTable(reactTable);
   }, [reactTable]);
 
-  useEffect(() => {
-    openCloseDetail(openDetail);
-  }, [openDetail]);
+  useEffect(() => openCloseDetail(openDetail), [openDetail]);
 
-  if (loading || error) {
+  useEffect(() => {
+    console.log("search ", search);
+    let filters: FilterRequest[] | undefined = undefined;
+    if (search?.key! && search?.value) {
+      filters = [
+        {
+          connector: CONNECTOR.AND,
+          operator: OPERATORS.LIKE,
+          keySearch: search?.key!,
+          value: search?.value,
+        },
+      ];
+    }
+    dispatch(
+      getUser({ page: currentPage, size: PAGINATION.limit, filter: filters })
+    );
+  }, [search]);
+
+  if (loading) {
     return <Loading />;
   }
 

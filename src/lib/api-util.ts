@@ -1,5 +1,8 @@
 import { Api, BaseResponse } from "@/interfaces/api";
 import { formatDate } from "./date-util";
+import { FilterRequest } from "@/interfaces/request-interface";
+import { URLSearchParams } from "url";
+import { OPERATORS } from "@/constant/common-constant";
 
 export const apiUtil: <T extends object>(
   config: Api<T>
@@ -19,8 +22,13 @@ export const apiUtil: <T extends object>(
 
     // Set query parameters
     Object.keys(config.queryParams || {}).forEach((key) => {
-      console.log("config.queryParams ", config.queryParams);
-      url.searchParams.append(key, config.queryParams![key]);
+      console.log(`key: ${key} , val: ${config.queryParams![key]}`);
+      if (key == "filter" && config.queryParams![key]) {
+        const { keySearch, search } = buildFilter(config.queryParams![key]);
+        if (search && keySearch) url.searchParams.append(keySearch, search);
+      } else {
+        url.searchParams.append(key, config.queryParams![key]);
+      }
     });
     // Set the media type header
     config.headers = {
@@ -67,5 +75,51 @@ export const apiUtil: <T extends object>(
       message: error.message,
     };
     return apiResponse;
+  }
+};
+
+const buildFilter = (
+  filters: FilterRequest[]
+): { keySearch: string; search: string | undefined } => {
+  console.log("INI FILTER YAA", filters);
+  let filterRequest: string | undefined;
+  filters.map((e) => {
+    console.log("e connector ", e.connector);
+
+    if (e.group) {
+    } else {
+      filterRequest = `:${e.connector}:`;
+      filterRequest += `${e.keySearch}`;
+      // filterRequest += `${e.operator}`;
+      filterRequest += parseOperator(e.operator);
+
+      if (e.operator.includes(OPERATORS.LIKE)) {
+        filterRequest += `%${e.value}%`;
+      } else {
+        filterRequest += `${e.value}`;
+      }
+    }
+  });
+
+  console.log("filterRequest ", filterRequest);
+
+  // one
+  // :AND:Name=User
+
+  // multiple
+  // :GROUP_AND:Name=User:OR:Desc=deskripsi
+
+  return {
+    keySearch: "filter",
+    search: filterRequest,
+  };
+};
+
+const parseOperator = (operator: string): string => {
+  switch (operator) {
+    case OPERATORS.LIKE:
+      return OPERATORS.EQUALS;
+    default:
+      return operator;
   }
 };

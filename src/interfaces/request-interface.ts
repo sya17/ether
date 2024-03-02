@@ -3,5 +3,13 @@ export interface getAllRequest {
   size: number;
   sorting?: Record<string, string>;
   pathParams?: Record<string, any>;
-  filters?: Record<string, any>;
+  filter?: FilterRequest[];
+}
+
+export interface FilterRequest {
+  group?: FilterRequest[];
+  operator: string;
+  connector: string;
+  keySearch: string;
+  value: any;
 }

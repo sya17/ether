@@ -75,7 +75,7 @@ export const getUser =
           page: req.page,
           size: req.size,
           sorting: req.sorting,
-          filters: req.filters,
+          filter: req.filter,
         },
         pathParams: req.pathParams,
       });
