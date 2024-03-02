@@ -1,16 +1,14 @@
 "use client";
 
+import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/layout/Navbar";
 import Sidebar from "@/layout/Sidebar";
-import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/components/ui/use-toast";
 import { setActivePage } from "@/lib/redux/slices/commonSlice";
 import { useDispatch, useSelector } from "@/lib/redux/store";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const dispatch = useDispatch();
-  const { toast } = useToast();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -37,8 +35,8 @@ export default function Home() {
         <main className="flex flex-1 max-h-full p-2 ">
           {ActivePage && <ActivePage className="h-full overflow-hidden" />}
         </main>
-        <Toaster />
       </div>
+      <Toaster />
     </div>
   );
 }

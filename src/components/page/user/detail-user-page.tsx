@@ -1,6 +1,7 @@
 "use client";
 
-import FormDetail from "@/components/common/detail/form-detail";
+import ButtonSave from "@/components/common/detail/buttonsave";
+import FormDetail from "@/components/common/detail/formdetail";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,19 +12,25 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { TOAST_MSG } from "@/constant/common-constant";
+import { GetKeyState } from "@/interfaces/api";
 import { User } from "@/interfaces/user";
 import {
+  clearPatch,
+  clearPost,
   getUserByKey,
   patchUser,
   postUser,
-  selectResourceError,
-  selectResourceLoading,
-  selectSelectedResource,
+  selectGetKey,
+  selectPatch,
+  selectPost,
 } from "@/lib/redux/slices/userSliceNew";
 import { useDispatch, useSelector } from "@/lib/redux/store";
+import { errorToast, successToast } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SaveIcon, Undo2 } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -41,8 +48,13 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   dataKey,
 }) => {
   const dispatch = useDispatch();
+  const { toast } = useToast();
   // fatch
-  const data: User | null = useSelector(selectSelectedResource);
+  const responseGet: GetKeyState<User> = useSelector(selectGetKey)!;
+  const responsePos: GetKeyState<User> = useSelector(selectPost)!;
+  const responsePatch: GetKeyState<User> = useSelector(selectPatch)!;
+
+  const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
     name: z
@@ -74,55 +86,79 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   };
 
   const onSave = async (values: z.infer<typeof formSchema>) => {
-    console.log("Start Save");
-
     if (dataKey && dataKey.id) {
-      // values.id = key.id!;
-      const dataUpdate: User = {
-        id: dataKey.id,
-        name: values.name,
-        username: values.username,
-        password: values.password,
-      };
-
       dispatch(
         patchUser({
           key: dataKey.id,
-          values: dataUpdate,
+          values: {
+            id: dataKey.id,
+            name: values.name,
+            username: values.username,
+            password: values.password,
+          },
         })
       );
     } else {
-      const saveData: User = {
-        id: undefined,
-        name: values.name,
-        username: values.username,
-        password: values.password,
-      };
-      dispatch(postUser(saveData));
+      dispatch(
+        postUser({
+          id: undefined,
+          name: values.name,
+          username: values.username,
+          password: values.password,
+        })
+      );
     }
-    doClose();
   };
+
+  useEffect(() => form.reset(), [openDetail]);
 
   useEffect(() => {
     if (dataKey && dataKey.id) {
       dispatch(getUserByKey(dataKey.id));
+      // setIsEdit(true);
     }
   }, [dataKey.id]);
 
   useEffect(() => {
-    console.log("data ", data);
-
-    if (data) {
-      form.setValue("name", data.name);
-      form.setValue("username", data.username);
+    if (responseGet.data) {
+      form.setValue("name", responseGet.data.name);
+      form.setValue("username", responseGet.data.username);
     }
-  }, [data]);
+  }, [responseGet.data]);
 
   useEffect(() => {
-    console.log("openDetail ", openDetail);
+    setLoading(responsePos.loading || responsePatch.loading);
+  }, [responsePos.loading, responsePatch.loading]);
 
-    form.reset();
-  }, [openDetail]);
+  useEffect(() => {
+    if (responsePos.success)
+      successToast({
+        toast: toast,
+        description: TOAST_MSG.SAVE_SUCCESS_MSG,
+      });
+    dispatch(clearPost());
+    if (responsePatch.success) {
+      successToast({
+        toast: toast,
+        description: TOAST_MSG.UPDATE_SUCCESS_MSG,
+      });
+      dispatch(clearPatch());
+    }
+    doClose();
+  }, [responsePos.success, responsePatch.success]);
+
+  useEffect(() => {
+    if (responsePos.error)
+      errorToast({
+        toast: toast,
+        description: responsePos.error ?? TOAST_MSG.ERR_MSG,
+      });
+    if (responsePatch.error)
+      errorToast({
+        toast: toast,
+        description: responsePatch.error ?? TOAST_MSG.ERR_MSG,
+      });
+  }, [responsePos.error, responsePatch.error]);
 
   return (
     <FormDetail
@@ -197,7 +233,7 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
               Cancel
             </span>
           </Button>
-          <Button
+          {/* <Button
             className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative"
             onClick={form.handleSubmit(onSave)}
           >
@@ -205,7 +241,8 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
             <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100 mx-auto left-8">
               Save
             </span>
-          </Button>
+          </Button> */}
+          <ButtonSave loading={loading} doSave={form.handleSubmit(onSave)} />
         </div>
       </div>
     </FormDetail>

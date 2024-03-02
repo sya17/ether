@@ -51,13 +51,13 @@ export const apiUtil: <T extends object>(
     const data = await response.json();
     console.log("data ", data);
 
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to fetch data");
-    }
+    // if (!response.ok) {
+    //   throw new Error(data.error || "Failed to fetch data");
+    // }
 
     const apiResponse: BaseResponse<T> = {
       timestamp: data.timestamp,
-      statusCode: data.statusCode,
+      statusCode: data.statusCode ?? response.status,
       error: data.error,
       message: data.message,
       ttlRecords: data.ttlRecords,
@@ -81,11 +81,10 @@ export const apiUtil: <T extends object>(
 const buildFilter = (
   filters: FilterRequest[]
 ): { keySearch: string; search: string | undefined } => {
-  console.log("INI FILTER YAA", filters);
+  // console.log("INI FILTER YAA", filters);
   let filterRequest: string | undefined;
   filters.map((e) => {
-    console.log("e connector ", e.connector);
-
+    // console.log("e connector ", e.connector);
     if (e.group) {
     } else {
       filterRequest = `:${e.connector}:`;
@@ -101,7 +100,7 @@ const buildFilter = (
     }
   });
 
-  console.log("filterRequest ", filterRequest);
+  // console.log("filterRequest ", filterRequest);
 
   // one
   // :AND:Name=User

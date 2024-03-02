@@ -19,15 +19,9 @@ import InquiryTable from "@/components/common/table/inquiry-table";
 import SearchTable from "@/components/common/table/search-table";
 import DetailUserPage from "./detail-user-page";
 import SetTable from "@/lib/table-util";
-import { apiUtil } from "@/lib/api-util";
-import {
-  getUser,
-  selectResourceData,
-  selectResourceError,
-  selectResourceLoading,
-  selectResourcePage,
-} from "@/lib/redux/slices/userSliceNew";
+import { getUser, selectGetAll } from "@/lib/redux/slices/userSliceNew";
 import { FilterRequest } from "@/interfaces/request-interface";
+import { GetAllState } from "@/interfaces/api";
 
 const idTable = "user-table";
 const detailPageComponent = "detail_user_page";
@@ -42,10 +36,11 @@ const UserPage: React.FC = () => {
   const [search, setSearch] = useState<{ key: string; value: any }>();
 
   // fatch
-  const dataList: User[] = useSelector(selectResourceData);
-  const page = useSelector(selectResourcePage);
-  const loading = useSelector(selectResourceLoading);
-  const error = useSelector(selectResourceError);
+  const response: GetAllState<User> = useSelector(selectGetAll)!;
+  // const loading = useSelector(selectResourceLoading);
+  // const dataList: User[] = useSelector(selectResourceDataList);
+  // const page = useSelector(selectResourcePage);
+  // const error = useSelector(selectResourceError);
 
   //search function
   const doSearch = (key: string | undefined, value: string | undefined) => {
@@ -60,12 +55,13 @@ const UserPage: React.FC = () => {
 
   //action open close detail
   const openCloseDetail = (val: boolean) => {
+    setKey(undefined);
     setOpenDetail(val);
   };
 
   // action page
   const handleNextPage = () => {
-    if (currentPage < page.ttlPages! - 1) {
+    if (currentPage < response.page.ttlPages! - 1) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -123,24 +119,21 @@ const UserPage: React.FC = () => {
 
   const reactTable = SetTable({
     id: idTable,
-    data: dataList,
+    data: response.dataList ?? [],
     columns: columns,
   });
 
-  useEffect(() => {
-    dispatch(getUser({ page: currentPage, size: PAGINATION.limit }));
-  }, [currentPage]);
+  // useEffect(() => {
+  //   dispatch(getUser({ page: currentPage, size: PAGINATION.limit }));
+  // }, [currentPage]);
+
+  // useEffect(() => {
+  //   if (reactTable) setDataTable(reactTable);
+  // }, [reactTable]);
+
+  useEffect(() => setDataTable(reactTable), [response.dataList]);
 
   useEffect(() => {
-    console.log("dataList ", dataList);
-
-    if (reactTable) setDataTable(reactTable);
-  }, [reactTable]);
-
-  useEffect(() => openCloseDetail(openDetail), [openDetail]);
-
-  useEffect(() => {
-    console.log("search ", search);
     let filters: FilterRequest[] | undefined = undefined;
     if (search?.key! && search?.value) {
       filters = [
@@ -155,9 +148,9 @@ const UserPage: React.FC = () => {
     dispatch(
       getUser({ page: currentPage, size: PAGINATION.limit, filter: filters })
     );
-  }, [search]);
+  }, [search, currentPage]);
 
-  if (loading) {
+  if (!response || response.loading) {
     return <Loading />;
   }
 
@@ -182,10 +175,10 @@ const UserPage: React.FC = () => {
           prevPage={handlePrevPage}
           toPage={toPage}
           page={{
-            pageNo: page.pageNo!,
-            pageRecords: page.pageRecords!,
-            ttlPages: page.ttlPages!,
-            ttlRecords: page.ttlRecords!,
+            pageNo: response.page.pageNo!,
+            pageRecords: response.page.pageRecords!,
+            ttlPages: response.page.ttlPages!,
+            ttlRecords: response.page.ttlRecords!,
           }}
         />
       </div>
