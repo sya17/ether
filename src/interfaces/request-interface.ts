@@ -1,7 +1,9 @@
 export interface getAllRequest {
   page: number;
   size: number;
-  sorting?: Record<string, string>;
+  // sorting?: Record<string, string>;
+  asc?: string[];
+  desc?: string[];
   pathParams?: Record<string, any>;
   filter?: FilterRequest[];
 }

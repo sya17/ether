@@ -93,21 +93,28 @@ export default function PagingTable({
   );
 
   return (
-    <page.Pagination className="justify-end">
-      <page.PaginationContent>
-        <page.PaginationItem className="cursor-pointer" key={"prev-page"}>
-          <page.PaginationPrevious onClick={prevPage} />
-        </page.PaginationItem>
-        {renderPaginationLinks()}
-        <page.PaginationItem
-          className={
-            ttlPages! == pageNo! + 1 ? "cursor-default" : "cursor-pointer"
-          }
-          key={"next-page"}
-        >
-          <page.PaginationNext onClick={nextPage} />
-        </page.PaginationItem>
-      </page.PaginationContent>
-    </page.Pagination>
+    <div className="flex">
+      {/* <div className="flex justify-start items-center ml-10">
+        <span>{pageNo}</span>
+        <span>&nbsp;of&nbsp;</span>
+        <span>0</span>
+      </div> */}
+      <page.Pagination className="justify-end items-center ">
+        <page.PaginationContent>
+          <page.PaginationItem className="cursor-pointer" key={"prev-page"}>
+            <page.PaginationPrevious onClick={prevPage} />
+          </page.PaginationItem>
+          {renderPaginationLinks()}
+          <page.PaginationItem
+            className={
+              ttlPages! == pageNo! + 1 ? "cursor-default" : "cursor-pointer"
+            }
+            key={"next-page"}
+          >
+            <page.PaginationNext onClick={nextPage} />
+          </page.PaginationItem>
+        </page.PaginationContent>
+      </page.Pagination>
+    </div>
   );
 }

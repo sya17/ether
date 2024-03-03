@@ -13,12 +13,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { TOAST_MSG } from "@/constant/common-constant";
+import { PAGINATION, TOAST_MSG } from "@/constant/common-constant";
 import { GetKeyState } from "@/interfaces/api";
 import { User } from "@/interfaces/user";
 import {
   clearPatch,
   clearPost,
+  getUser,
   getUserByKey,
   patchUser,
   postUser,
@@ -55,6 +56,7 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   const responsePatch: GetKeyState<User> = useSelector(selectPatch)!;
 
   const [loading, setLoading] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
   const formSchema = z.object({
     name: z
@@ -86,6 +88,8 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   };
 
   const onSave = async (values: z.infer<typeof formSchema>) => {
+    console.log("onSave ", onSave);
+
     if (dataKey && dataKey.id) {
       dispatch(
         patchUser({
@@ -110,14 +114,21 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
     }
   };
 
-  useEffect(() => form.reset(), [openDetail]);
+  useEffect(() => {
+    console.log("openDetail ", openDetail);
+
+    form.reset();
+  }, [openDetail]);
 
   useEffect(() => {
+    console.log("dataKey ", dataKey);
     if (dataKey && dataKey.id) {
       dispatch(getUserByKey(dataKey.id));
-      // setIsEdit(true);
+      setIsEdit(true);
+    } else {
+      setIsEdit(false);
     }
-  }, [dataKey.id]);
+  }, [dataKey]);
 
   useEffect(() => {
     if (responseGet.data) {
@@ -131,18 +142,21 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   }, [responsePos.loading, responsePatch.loading]);
 
   useEffect(() => {
-    if (responsePos.success)
+    if (responsePos.success) {
       successToast({
         toast: toast,
         description: TOAST_MSG.SAVE_SUCCESS_MSG,
       });
-    dispatch(clearPost());
+      dispatch(clearPost());
+      dispatch(getUser({ page: 0, size: PAGINATION.limit }));
+    }
     if (responsePatch.success) {
       successToast({
         toast: toast,
         description: TOAST_MSG.UPDATE_SUCCESS_MSG,
       });
       dispatch(clearPatch());
+      dispatch(getUser({ page: 0, size: PAGINATION.limit }));
     }
     doClose();
   }, [responsePos.success, responsePatch.success]);

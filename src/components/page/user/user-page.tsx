@@ -10,7 +10,12 @@ import {
   ColumnHeader,
 } from "@/components/common/table/column-table";
 import Loading from "@/app/loading";
-import { CONNECTOR, OPERATORS, PAGINATION } from "@/constant/common-constant";
+import {
+  CONNECTOR,
+  OPERATORS,
+  PAGINATION,
+  TOAST_MSG,
+} from "@/constant/common-constant";
 import { ActionCell } from "@/components/common/table/action-cell-table";
 import ButtonAdd from "@/components/common/table/button-add";
 import ButtonDelete from "@/components/common/table/Button-delete";
@@ -19,9 +24,17 @@ import InquiryTable from "@/components/common/table/inquiry-table";
 import SearchTable from "@/components/common/table/search-table";
 import DetailUserPage from "./detail-user-page";
 import SetTable from "@/lib/table-util";
-import { getUser, selectGetAll } from "@/lib/redux/slices/userSliceNew";
+import {
+  deleteUser,
+  deleteUserList,
+  getUser,
+  selectDelete,
+  selectGetAll,
+} from "@/lib/redux/slices/userSliceNew";
 import { FilterRequest } from "@/interfaces/request-interface";
-import { GetAllState } from "@/interfaces/api";
+import { DeleteState, GetAllState } from "@/interfaces/api";
+import { errorToast, successToast } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
 
 const idTable = "user-table";
 const detailPageComponent = "detail_user_page";
@@ -29,34 +42,55 @@ const detailPageComponent = "detail_user_page";
 // page
 const UserPage: React.FC = () => {
   const dispatch = useDispatch();
+  const { toast } = useToast();
   const [key, setKey] = useState<number>();
   const [openDetail, setOpenDetail] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [dataTable, setDataTable] = useState<Table<User>>();
-  const [search, setSearch] = useState<{ key: string; value: any }>();
+  // const [search, setSearch] = useState<{ key: string; value: any }>();
+  const [search, setSearch] = useState<FilterRequest[] | undefined>(undefined);
 
   // fatch
   const response: GetAllState<User> = useSelector(selectGetAll)!;
-  // const loading = useSelector(selectResourceLoading);
-  // const dataList: User[] = useSelector(selectResourceDataList);
-  // const page = useSelector(selectResourcePage);
-  // const error = useSelector(selectResourceError);
+  const responseDelete: DeleteState<User> = useSelector(selectDelete)!;
 
   //search function
   const doSearch = (key: string | undefined, value: string | undefined) => {
-    setSearch({ key: key!, value: value });
+    // setSearch({ key: key!, value: value });
+    if (key && value) {
+      setSearch([
+        {
+          connector: CONNECTOR.AND,
+          operator: OPERATORS.LIKE,
+          keySearch: key,
+          value: value,
+        },
+      ]);
+    } else {
+      setSearch(undefined);
+    }
   };
 
   //do detail function
   const doDetail = (val: User | undefined) => {
+    console.log("doDetail");
     openCloseDetail(true);
     setKey(val?.id);
   };
 
   //action open close detail
   const openCloseDetail = (val: boolean) => {
+    console.log("openCloseDetail");
     setKey(undefined);
     setOpenDetail(val);
+  };
+
+  // do Delete By Id
+  const doDelete = (val: User | undefined) => {
+    if (val) {
+      dispatch(deleteUser(val.id!));
+      fetchUser();
+    }
   };
 
   // action page
@@ -75,7 +109,110 @@ const UserPage: React.FC = () => {
   };
 
   // column definition
-  const columns: ColumnDef<User>[] = [
+  const columns: ColumnDef<User>[] = getColumnsUser({
+    doDetail: doDetail,
+    doDelete: doDelete,
+  });
+
+  const reactTable = SetTable({
+    id: idTable,
+    data: response.dataList ?? [],
+    columns: columns,
+  });
+
+  // do Delete Selected
+  const doDeleteSelected = () => {
+    const userList: User[] = reactTable
+      .getSelectedRowModel()
+      .rows.map((e) => e.original);
+    dispatch(deleteUserList(userList));
+    fetchUser();
+  };
+
+  const fetchUser = () => {
+    dispatch(
+      getUser({
+        page: currentPage,
+        size: PAGINATION.limit,
+        desc: ["updatedDate"],
+        filter: search,
+      })
+    );
+  };
+
+  useEffect(() => setDataTable(reactTable), [response.dataList]);
+
+  useEffect(() => fetchUser(), [search, currentPage]);
+
+  // useEffect(() => setKey(key), [key]);
+
+  useEffect(() => {
+    if (responseDelete.success)
+      successToast({
+        toast: toast,
+        description: TOAST_MSG.DELETE_SUCCESS_MSG,
+      });
+  }, [responseDelete.success]);
+
+  useEffect(() => {
+    if (responseDelete.error)
+      errorToast({
+        toast: toast,
+        description: responseDelete.error ?? TOAST_MSG.ERR_MSG,
+      });
+  }, [responseDelete.error]);
+
+  if (!response || response.loading) {
+    return <Loading />;
+  }
+
+  return (
+    <div className="w-full">
+      {/* Header Render */}
+      <div>
+        <div className="flex items-center py-4">
+          <SearchTable dataTable={dataTable} doSearch={doSearch} />
+          <div className=" w-full flex justify-end ml-auto float-right space-x-2 px-2">
+            <ButtonAdd openCloseDetail={openCloseDetail} />
+            <ButtonDelete doDeleteSelected={doDeleteSelected} />
+          </div>
+          <FilterTable dataTable={dataTable} />
+        </div>
+
+        {/* Table Render */}
+        <InquiryTable
+          columns={columns}
+          dataTable={dataTable}
+          nextPage={handleNextPage}
+          prevPage={handlePrevPage}
+          toPage={toPage}
+          page={{
+            pageNo: response.page.pageNo!,
+            pageRecords: response.page.pageRecords!,
+            ttlPages: response.page.ttlPages!,
+            ttlRecords: response.page.ttlRecords!,
+          }}
+        />
+      </div>
+      {/* detail page */}
+      <DetailUserPage
+        openDetail={openDetail}
+        openCloseDetail={openCloseDetail}
+        dataKey={{ id: key }}
+      />
+    </div>
+  );
+};
+export default UserPage;
+
+export const getColumnsUser = ({
+  doDetail,
+  doDelete,
+}: {
+  doDetail: (val: User | undefined) => void;
+  doDelete: (val: User | undefined) => void;
+}): ColumnDef<User>[] => {
+  return [
     {
       id: "select",
       header: ({ table }) => <SelectAll table={table} />,
@@ -111,85 +248,9 @@ const UserPage: React.FC = () => {
             page: detailPageComponent,
           }}
           doDetail={doDetail}
-          doDeleted={() => {}}
+          doDeleted={doDelete}
         />
       ),
     },
   ];
-
-  const reactTable = SetTable({
-    id: idTable,
-    data: response.dataList ?? [],
-    columns: columns,
-  });
-
-  // useEffect(() => {
-  //   dispatch(getUser({ page: currentPage, size: PAGINATION.limit }));
-  // }, [currentPage]);
-
-  // useEffect(() => {
-  //   if (reactTable) setDataTable(reactTable);
-  // }, [reactTable]);
-
-  useEffect(() => setDataTable(reactTable), [response.dataList]);
-
-  useEffect(() => {
-    let filters: FilterRequest[] | undefined = undefined;
-    if (search?.key! && search?.value) {
-      filters = [
-        {
-          connector: CONNECTOR.AND,
-          operator: OPERATORS.LIKE,
-          keySearch: search?.key!,
-          value: search?.value,
-        },
-      ];
-    }
-    dispatch(
-      getUser({ page: currentPage, size: PAGINATION.limit, filter: filters })
-    );
-  }, [search, currentPage]);
-
-  if (!response || response.loading) {
-    return <Loading />;
-  }
-
-  return (
-    <div className="w-full">
-      {/* Header Render */}
-      <div>
-        <div className="flex items-center py-4">
-          <SearchTable dataTable={dataTable} doSearch={doSearch} />
-          <div className=" w-full flex justify-end ml-auto float-right space-x-2 px-2">
-            <ButtonAdd openCloseDetail={openCloseDetail} />
-            <ButtonDelete />
-          </div>
-          <FilterTable dataTable={dataTable} />
-        </div>
-
-        {/* Table Render */}
-        <InquiryTable
-          columns={columns}
-          dataTable={dataTable}
-          nextPage={handleNextPage}
-          prevPage={handlePrevPage}
-          toPage={toPage}
-          page={{
-            pageNo: response.page.pageNo!,
-            pageRecords: response.page.pageRecords!,
-            ttlPages: response.page.ttlPages!,
-            ttlRecords: response.page.ttlRecords!,
-          }}
-        />
-      </div>
-      {/* detail page */}
-      <DetailUserPage
-        openDetail={openDetail}
-        openCloseDetail={openCloseDetail}
-        dataKey={{ id: key }}
-      />
-    </div>
-  );
 };
-
-export default UserPage;

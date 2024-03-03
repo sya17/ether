@@ -10,6 +10,7 @@ import {
 import { getAllRequest } from "@/interfaces/request-interface";
 import { API_METHOD, TOAST_MSG } from "@/constant/common-constant";
 import { STATUS_CODES } from "http";
+import { formatDate } from "@/lib/date-util";
 
 const initialState: ResourceState<User> = defaultIntialState<User>();
 
@@ -188,7 +189,8 @@ export const getUser =
         queryParams: {
           page: req.page,
           size: req.size,
-          sorting: req.sorting,
+          acs: req.asc,
+          desc: req.desc,
           filter: req.filter,
         },
         pathParams: req.pathParams,
@@ -325,5 +327,32 @@ export const deleteUser =
       }
     } catch (error) {
       fetchResourceError({ error: error, method: API_METHOD.DELETE });
+    }
+  };
+export const deleteUserList =
+  (dataList: User[]): AppThunk =>
+  async (dispatch) => {
+    if (dataList) {
+      try {
+        dispatch(fetchResourceStart({ method: API_METHOD.DELETE }));
+        dataList.map(async (e) => {
+          await apiUtil<User>({
+            endpoint: `User/${e.id}`,
+            method: "DELETE",
+          });
+        });
+
+        dispatch(
+          fetchResourceData({
+            response: {
+              timestamp: formatDate(new Date()),
+              message: "Delete List User Success",
+            },
+            method: API_METHOD.DELETE,
+          })
+        );
+      } catch (error) {
+        fetchResourceError({ error: error, method: API_METHOD.DELETE });
+      }
     }
   };
