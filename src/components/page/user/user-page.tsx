@@ -25,6 +25,7 @@ import SearchTable from "@/components/common/table/search-table";
 import DetailUserPage from "./detail-user-page";
 import SetTable from "@/lib/table-util";
 import {
+  clearGetAll,
   deleteUser,
   deleteUserList,
   getUser,
@@ -147,11 +148,13 @@ const UserPage: React.FC = () => {
   // useEffect(() => setKey(key), [key]);
 
   useEffect(() => {
-    if (responseDelete.success)
+    if (responseDelete.success) {
       successToast({
         toast: toast,
         description: TOAST_MSG.DELETE_SUCCESS_MSG,
       });
+      dispatch(clearGetAll());
+    }
   }, [responseDelete.success]);
 
   useEffect(() => {

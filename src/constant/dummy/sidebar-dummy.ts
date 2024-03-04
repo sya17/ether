@@ -35,11 +35,11 @@ export const sidebarDummy: Sidebar[] = [
     label: "Approval",
     icon: "layout-dashboard",
   },
-  // {
-  //   id: "company_page",
-  //   label: "Company",
-  //   icon: "layout-dashboard",
-  // },
+  {
+    id: "company_page",
+    label: "Company",
+    icon: "layout-dashboard",
+  },
   // {
   //   id: "customer_page",
   //   label: "Customer",

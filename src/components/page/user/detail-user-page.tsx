@@ -17,6 +17,7 @@ import { PAGINATION, TOAST_MSG } from "@/constant/common-constant";
 import { GetKeyState } from "@/interfaces/api";
 import { User } from "@/interfaces/user";
 import {
+  clearGetKey,
   clearPatch,
   clearPost,
   getUser,
@@ -30,7 +31,7 @@ import {
 import { useDispatch, useSelector } from "@/lib/redux/store";
 import { errorToast, successToast } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SaveIcon, Undo2 } from "lucide-react";
+import { Undo2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -56,7 +57,6 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   const responsePatch: GetKeyState<User> = useSelector(selectPatch)!;
 
   const [loading, setLoading] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
 
   const formSchema = z.object({
     name: z
@@ -115,18 +115,10 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   };
 
   useEffect(() => {
-    console.log("openDetail ", openDetail);
-
     form.reset();
-  }, [openDetail]);
-
-  useEffect(() => {
     console.log("dataKey ", dataKey);
     if (dataKey && dataKey.id) {
       dispatch(getUserByKey(dataKey.id));
-      setIsEdit(true);
-    } else {
-      setIsEdit(false);
     }
   }, [dataKey]);
 
@@ -134,6 +126,7 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
     if (responseGet.data) {
       form.setValue("name", responseGet.data.name);
       form.setValue("username", responseGet.data.username);
+      dispatch(clearGetKey());
     }
   }, [responseGet.data]);
 
@@ -247,15 +240,6 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
               Cancel
             </span>
           </Button>
-          {/* <Button
-            className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative"
-            onClick={form.handleSubmit(onSave)}
-          >
-            <SaveIcon className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-14" />
-            <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100 mx-auto left-8">
-              Save
-            </span>
-          </Button> */}
           <ButtonSave loading={loading} doSave={form.handleSubmit(onSave)} />
         </div>
       </div>
