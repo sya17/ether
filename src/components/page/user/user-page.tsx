@@ -29,6 +29,7 @@ import {
   deleteUser,
   deleteUserList,
   getUser,
+  getUserByKey,
   selectDelete,
   selectGetAll,
 } from "@/lib/redux/slices/userSliceNew";
@@ -44,7 +45,7 @@ const detailPageComponent = "detail_user_page";
 const UserPage: React.FC = () => {
   const dispatch = useDispatch();
   const { toast } = useToast();
-  const [key, setKey] = useState<number>();
+  // const [key, setKey] = useState<number>();
   const [openDetail, setOpenDetail] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [dataTable, setDataTable] = useState<Table<User>>();
@@ -75,15 +76,11 @@ const UserPage: React.FC = () => {
   //do detail function
   const doDetail = (val: User | undefined) => {
     console.log("doDetail");
-    openCloseDetail(true);
-    setKey(val?.id);
-  };
-
-  //action open close detail
-  const openCloseDetail = (val: boolean) => {
-    console.log("openCloseDetail");
-    setKey(undefined);
-    setOpenDetail(val);
+    // openCloseDetail(true);
+    setOpenDetail(true);
+    if (val?.id) {
+      dispatch(getUserByKey(val?.id));
+    }
   };
 
   // do Delete By Id
@@ -176,7 +173,7 @@ const UserPage: React.FC = () => {
         <div className="flex items-center py-4">
           <SearchTable dataTable={dataTable} doSearch={doSearch} />
           <div className=" w-full flex justify-end ml-auto float-right space-x-2 px-2">
-            <ButtonAdd openCloseDetail={openCloseDetail} />
+            <ButtonAdd openCloseDetail={setOpenDetail} />
             <ButtonDelete doDeleteSelected={doDeleteSelected} />
           </div>
           <FilterTable dataTable={dataTable} />
@@ -198,11 +195,7 @@ const UserPage: React.FC = () => {
         />
       </div>
       {/* detail page */}
-      <DetailUserPage
-        openDetail={openDetail}
-        openCloseDetail={openCloseDetail}
-        dataKey={{ id: key }}
-      />
+      <DetailUserPage openDetail={openDetail} closeDetail={setOpenDetail} />
     </div>
   );
 };

@@ -75,15 +75,14 @@ const CompanyPage: React.FC = () => {
   //do detail function
   const doDetail = (val: Company | undefined) => {
     console.log("doDetail");
-    openCloseDetail(true);
+    // openCloseDetail(true);
+    setOpenDetail(true);
     setKey(val?.id);
   };
 
-  //action open close detail
-  const openCloseDetail = (val: boolean) => {
-    console.log("openCloseDetail");
+  const doCloseDetail = () => {
     setKey(undefined);
-    setOpenDetail(val);
+    setOpenDetail(false);
   };
 
   // do Delete By Id
@@ -176,7 +175,7 @@ const CompanyPage: React.FC = () => {
         <div className="flex items-center py-4">
           <SearchTable dataTable={dataTable} doSearch={doSearch} />
           <div className=" w-full flex justify-end ml-auto float-right space-x-2 px-2">
-            <ButtonAdd openCloseDetail={openCloseDetail} />
+            <ButtonAdd openCloseDetail={doDetail} />
             <ButtonDelete doDeleteSelected={doDeleteSelected} />
           </div>
           <FilterTable dataTable={dataTable} />
@@ -200,7 +199,7 @@ const CompanyPage: React.FC = () => {
       {/* detail page */}
       <DetailCompanyPage
         openDetail={openDetail}
-        openCloseDetail={openCloseDetail}
+        closeDetail={doCloseDetail}
         dataKey={{ id: key }}
       />
     </div>
@@ -231,11 +230,11 @@ export const getColumnsCompany = ({
       cell: ({ row }) => <ColumnCell row={row} name="name" />,
     },
     {
-      accessorKey: "username",
+      accessorKey: "publicKey",
       header: ({ column }) => (
-        <ColumnHeader columns={column} name="Companyname" sorting={false} />
+        <ColumnHeader columns={column} name="Public Key" sorting={false} />
       ),
-      cell: ({ row }) => <ColumnCell row={row} name="username" />,
+      cell: ({ row }) => <ColumnCell row={row} name="publicKey" />,
     },
     {
       id: "actions",

@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 export default function ButtonAdd({
   openCloseDetail,
 }: {
-  openCloseDetail: (val: boolean) => void;
+  openCloseDetail: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <Button

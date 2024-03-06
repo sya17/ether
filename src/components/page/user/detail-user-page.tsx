@@ -38,16 +38,12 @@ import * as z from "zod";
 
 interface UserDetailProps {
   openDetail: boolean;
-  openCloseDetail: (val: boolean) => void;
-  dataKey: {
-    id?: number;
-  };
+  closeDetail: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const DetailUserPage: React.FC<UserDetailProps> = ({
   openDetail,
-  openCloseDetail,
-  dataKey,
+  closeDetail,
 }) => {
   const dispatch = useDispatch();
   const { toast } = useToast();
@@ -57,6 +53,8 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   const responsePatch: GetKeyState<User> = useSelector(selectPatch)!;
 
   const [loading, setLoading] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [dataDetail, setDataDetail] = useState<User | undefined>(undefined);
 
   const formSchema = z.object({
     name: z
@@ -83,19 +81,14 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
     resolver: zodResolver(formSchema),
   });
 
-  const doClose = () => {
-    openCloseDetail(false);
-  };
-
   const onSave = async (values: z.infer<typeof formSchema>) => {
     console.log("onSave ", onSave);
-
-    if (dataKey && dataKey.id) {
+    if (isEdit) {
       dispatch(
         patchUser({
-          key: dataKey.id,
+          key: dataDetail?.id!,
           values: {
-            id: dataKey.id,
+            id: dataDetail?.id,
             name: values.name,
             username: values.username,
             password: values.password,
@@ -115,25 +108,21 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   };
 
   useEffect(() => {
-    form.reset();
-    console.log("dataKey ", dataKey);
-    if (dataKey && dataKey.id) {
-      dispatch(getUserByKey(dataKey.id));
-    }
-  }, [dataKey]);
-
-  useEffect(() => {
     if (responseGet.data) {
       form.setValue("name", responseGet.data.name);
       form.setValue("username", responseGet.data.username);
       dispatch(clearGetKey());
+      setDataDetail(responseGet.data);
+      setIsEdit(true);
     }
   }, [responseGet.data]);
 
+  // loading after fetch save / update
   useEffect(() => {
     setLoading(responsePos.loading || responsePatch.loading);
   }, [responsePos.loading, responsePatch.loading]);
 
+  // success after save / update
   useEffect(() => {
     if (responsePos.success) {
       successToast({
@@ -151,9 +140,10 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
       dispatch(clearPatch());
       dispatch(getUser({ page: 0, size: PAGINATION.limit }));
     }
-    doClose();
+    closeDetail(false);
   }, [responsePos.success, responsePatch.success]);
 
+  // Error after save / update
   useEffect(() => {
     if (responsePos.error)
       errorToast({
@@ -170,7 +160,7 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   return (
     <FormDetail
       openDetail={openDetail}
-      openCloseDetail={openCloseDetail}
+      closeDetail={closeDetail}
       title="User"
       desc="Masterdata of User"
     >
@@ -233,7 +223,7 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
         <div className="flex space-x-2 justify-center">
           <Button
             className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative"
-            onClick={doClose}
+            onClick={() => closeDetail(false)}
           >
             <Undo2 className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-14" />
             <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100 mx-auto left-8">

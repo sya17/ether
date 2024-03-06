@@ -21,7 +21,6 @@ import {
   clearPatch,
   clearPost,
   getCompany,
-  getCompanyByKey,
   patchCompany,
   postCompany,
   selectGetKey,
@@ -38,7 +37,7 @@ import * as z from "zod";
 
 interface CompanyDetailProps {
   openDetail: boolean;
-  openCloseDetail: (val: boolean) => void;
+  closeDetail: () => void;
   dataKey: {
     id?: number;
   };
@@ -46,7 +45,7 @@ interface CompanyDetailProps {
 
 const DetailCompanyPage: React.FC<CompanyDetailProps> = ({
   openDetail,
-  openCloseDetail,
+  closeDetail,
   dataKey,
 }) => {
   const dispatch = useDispatch();
@@ -77,10 +76,6 @@ const DetailCompanyPage: React.FC<CompanyDetailProps> = ({
     resolver: zodResolver(formSchema),
   });
 
-  const doClose = () => {
-    openCloseDetail(false);
-  };
-
   const onSave = async (values: z.infer<typeof formSchema>) => {
     console.log("onSave ", onSave);
 
@@ -110,7 +105,7 @@ const DetailCompanyPage: React.FC<CompanyDetailProps> = ({
     form.reset();
     console.log("dataKey ", dataKey);
     if (dataKey && dataKey.id) {
-      dispatch(getCompanyByKey(dataKey.id));
+      // dispatch(getCompanyByKey(dataKey.id));
     }
   }, [dataKey]);
 
@@ -143,7 +138,7 @@ const DetailCompanyPage: React.FC<CompanyDetailProps> = ({
       dispatch(clearPatch());
       dispatch(getCompany({ page: 0, size: PAGINATION.limit }));
     }
-    doClose();
+    closeDetail();
   }, [responsePos.success, responsePatch.success]);
 
   useEffect(() => {
@@ -162,7 +157,7 @@ const DetailCompanyPage: React.FC<CompanyDetailProps> = ({
   return (
     <FormDetail
       openDetail={openDetail}
-      openCloseDetail={openCloseDetail}
+      closeDetail={closeDetail}
       title="Company"
       desc="Masterdata of Company"
     >
@@ -208,7 +203,7 @@ const DetailCompanyPage: React.FC<CompanyDetailProps> = ({
         <div className="flex space-x-2 justify-center">
           <Button
             className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative"
-            onClick={doClose}
+            onClick={closeDetail}
           >
             <Undo2 className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-14" />
             <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100 mx-auto left-8">

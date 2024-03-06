@@ -16,17 +16,17 @@ export default function FormDetail({
   title,
   desc,
   openDetail,
-  openCloseDetail,
+  closeDetail,
 }: {
   openDetail: boolean;
-  openCloseDetail: (val: boolean) => void;
+  closeDetail: React.Dispatch<React.SetStateAction<boolean>>;
   children: React.ReactNode;
   title: string;
   desc: string;
 }) {
-  const openClosed = (val: boolean) => {
-    openCloseDetail(val);
-  };
+  // const openClosed = (val: boolean) => {
+  //   openCloseDetail(val);
+  // };
   return (
     // <drawer.Drawer
     //   open={openDetail}
@@ -44,10 +44,10 @@ export default function FormDetail({
     //     {children}
     //   </drawer.DrawerContent>
     // </drawer.Drawer>
-    <Sheet onOpenChange={openClosed} open={openDetail}>
+    <Sheet onOpenChange={() => closeDetail(false)} open={openDetail}>
       {/* <SheetTrigger>Open</SheetTrigger> */}
       {/* <SheetContent side={"right"} onInteractOutside={() => openClosed(false)}> */}
-      <SheetContent side={"right"} onInteractOutside={() => openClosed(false)}>
+      <SheetContent side={"right"} onInteractOutside={() => closeDetail(false)}>
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{desc}</SheetDescription>

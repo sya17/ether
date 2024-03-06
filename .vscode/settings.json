@@ -1,7 +1,8 @@
 {
     "conventionalCommits.scopes": [
         "form layout main",
-        "all"
+        "all",
+        "menu user & company"
     ],
     "vscord.enabled": false
 }
