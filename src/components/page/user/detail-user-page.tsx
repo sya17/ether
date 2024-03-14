@@ -38,7 +38,7 @@ import * as z from "zod";
 
 interface UserDetailProps {
   openDetail: boolean;
-  closeDetail: React.Dispatch<React.SetStateAction<boolean>>;
+  closeDetail: () => void;
 }
 
 const DetailUserPage: React.FC<UserDetailProps> = ({
@@ -108,6 +108,7 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
   };
 
   useEffect(() => {
+    console.log("GET DATA DETAIL");
     if (responseGet.data) {
       form.setValue("name", responseGet.data.name);
       form.setValue("username", responseGet.data.username);
@@ -119,11 +120,13 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
 
   // loading after fetch save / update
   useEffect(() => {
+    console.log("LOADING AFTER SAVE");
     setLoading(responsePos.loading || responsePatch.loading);
   }, [responsePos.loading, responsePatch.loading]);
 
   // success after save / update
   useEffect(() => {
+    console.log("SUCCESS AFTER SAVE");
     if (responsePos.success) {
       successToast({
         toast: toast,
@@ -131,6 +134,7 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
       });
       dispatch(clearPost());
       dispatch(getUser({ page: 0, size: PAGINATION.limit }));
+      closeDetail();
     }
     if (responsePatch.success) {
       successToast({
@@ -139,12 +143,13 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
       });
       dispatch(clearPatch());
       dispatch(getUser({ page: 0, size: PAGINATION.limit }));
+      closeDetail();
     }
-    closeDetail(false);
   }, [responsePos.success, responsePatch.success]);
 
   // Error after save / update
   useEffect(() => {
+    console.log("ERROR AFTER SAVE");
     if (responsePos.error)
       errorToast({
         toast: toast,
@@ -223,7 +228,7 @@ const DetailUserPage: React.FC<UserDetailProps> = ({
         <div className="flex space-x-2 justify-center">
           <Button
             className="inline-flex space-x-2 items-center bg-primary text-primary-foreground group relative"
-            onClick={() => closeDetail(false)}
+            onClick={() => closeDetail}
           >
             <Undo2 className="w-4 h-4 transition-all duration-300 opacity-100 group-hover:mr-14" />
             <span className="absolute opacity-0 transition-all duration-300 group-hover:opacity-100 mx-auto left-8">

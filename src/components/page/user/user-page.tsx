@@ -45,12 +45,10 @@ const detailPageComponent = "detail_user_page";
 const UserPage: React.FC = () => {
   const dispatch = useDispatch();
   const { toast } = useToast();
-  // const [key, setKey] = useState<number>();
-  const [openDetail, setOpenDetail] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [dataTable, setDataTable] = useState<Table<User>>();
-  // const [search, setSearch] = useState<{ key: string; value: any }>();
   const [search, setSearch] = useState<FilterRequest[] | undefined>(undefined);
+  const [isOpenDetail, setIsOpenDetail] = useState(false);
 
   // fatch
   const response: GetAllState<User> = useSelector(selectGetAll)!;
@@ -58,7 +56,6 @@ const UserPage: React.FC = () => {
 
   //search function
   const doSearch = (key: string | undefined, value: string | undefined) => {
-    // setSearch({ key: key!, value: value });
     if (key && value) {
       setSearch([
         {
@@ -73,14 +70,20 @@ const UserPage: React.FC = () => {
     }
   };
 
-  //do detail function
-  const doDetail = (val: User | undefined) => {
-    console.log("doDetail");
-    // openCloseDetail(true);
-    setOpenDetail(true);
-    if (val?.id) {
-      dispatch(getUserByKey(val?.id));
+  // detail action
+  const openDetailEdit = (val: User) => {
+    console.log("OPEN DETAIL EDIT");
+    if (val) {
+      dispatch(getUserByKey(val.id!));
     }
+    setIsOpenDetail(true);
+  };
+  const openDetail = () => {
+    console.log("OPEN DETAIL ADD");
+    setIsOpenDetail(true);
+  };
+  const closedDetail = () => {
+    setIsOpenDetail(true);
   };
 
   // do Delete By Id
@@ -106,18 +109,6 @@ const UserPage: React.FC = () => {
     setCurrentPage(page - 1);
   };
 
-  // column definition
-  const columns: ColumnDef<User>[] = getColumnsUser({
-    doDetail: doDetail,
-    doDelete: doDelete,
-  });
-
-  const reactTable = SetTable({
-    id: idTable,
-    data: response.dataList ?? [],
-    columns: columns,
-  });
-
   // do Delete Selected
   const doDeleteSelected = () => {
     const userList: User[] = reactTable
@@ -138,11 +129,21 @@ const UserPage: React.FC = () => {
     );
   };
 
+  // column definition
+  const columns: ColumnDef<User>[] = getColumnsUser({
+    doDetail: openDetailEdit,
+    doDelete: doDelete,
+  });
+
+  const reactTable = SetTable({
+    id: idTable,
+    data: response.dataList ?? [],
+    columns: columns,
+  });
+
   useEffect(() => setDataTable(reactTable), [response.dataList]);
 
   useEffect(() => fetchUser(), [search, currentPage]);
-
-  // useEffect(() => setKey(key), [key]);
 
   useEffect(() => {
     if (responseDelete.success) {
@@ -173,7 +174,7 @@ const UserPage: React.FC = () => {
         <div className="flex items-center py-4">
           <SearchTable dataTable={dataTable} doSearch={doSearch} />
           <div className=" w-full flex justify-end ml-auto float-right space-x-2 px-2">
-            <ButtonAdd openCloseDetail={setOpenDetail} />
+            <ButtonAdd openDetail={openDetail} />
             <ButtonDelete doDeleteSelected={doDeleteSelected} />
           </div>
           <FilterTable dataTable={dataTable} />
@@ -195,7 +196,11 @@ const UserPage: React.FC = () => {
         />
       </div>
       {/* detail page */}
-      <DetailUserPage openDetail={openDetail} closeDetail={setOpenDetail} />
+      {isOpenDetail ? (
+        <DetailUserPage openDetail={isOpenDetail} closeDetail={closedDetail} />
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
@@ -205,7 +210,7 @@ export const getColumnsUser = ({
   doDetail,
   doDelete,
 }: {
-  doDetail: (val: User | undefined) => void;
+  doDetail: (val: User) => void;
   doDelete: (val: User | undefined) => void;
 }): ColumnDef<User>[] => {
   return [
@@ -243,7 +248,7 @@ export const getColumnsUser = ({
             description: "",
             page: detailPageComponent,
           }}
-          doDetail={doDetail}
+          doDetail={() => doDetail(row.original)}
           doDeleted={doDelete}
         />
       ),

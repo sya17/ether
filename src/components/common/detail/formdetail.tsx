@@ -18,36 +18,15 @@ export default function FormDetail({
   openDetail,
   closeDetail,
 }: {
-  openDetail: boolean;
-  closeDetail: React.Dispatch<React.SetStateAction<boolean>>;
   children: React.ReactNode;
   title: string;
   desc: string;
+  openDetail: boolean;
+  closeDetail: () => void;
 }) {
-  // const openClosed = (val: boolean) => {
-  //   openCloseDetail(val);
-  // };
   return (
-    // <drawer.Drawer
-    //   open={openDetail}
-    //   onOpenChange={openClosed}
-    //   direction="right"
-    // >
-    //   <drawer.DrawerContent
-    //     className="h-screen top-0 right-0 left-auto mt-0 w-[500px] rounded-l-md px-6 rounded-r-none"
-    //     onInteractOutside={() => openClosed(false)}
-    //   >
-    //     <drawer.DrawerHeader>
-    //       <drawer.DrawerTitle>{title}</drawer.DrawerTitle>
-    //       <drawer.DrawerDescription>{desc}</drawer.DrawerDescription>
-    //     </drawer.DrawerHeader>
-    //     {children}
-    //   </drawer.DrawerContent>
-    // </drawer.Drawer>
-    <Sheet onOpenChange={() => closeDetail(false)} open={openDetail}>
-      {/* <SheetTrigger>Open</SheetTrigger> */}
-      {/* <SheetContent side={"right"} onInteractOutside={() => openClosed(false)}> */}
-      <SheetContent side={"right"} onInteractOutside={() => closeDetail(false)}>
+    <Sheet onOpenChange={closeDetail} open={openDetail}>
+      <SheetContent side={"right"} onInteractOutside={closeDetail}>
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{desc}</SheetDescription>
